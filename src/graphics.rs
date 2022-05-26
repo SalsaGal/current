@@ -10,7 +10,7 @@ pub struct Graphics {
 }
 
 impl Graphics {
-    pub async fn new(window: &Window) -> Self {
+    pub(crate) async fn new(window: &Window) -> Self {
         let size = window.inner_size();
 
         let instance = wgpu::Instance::new(wgpu::Backends::all());
