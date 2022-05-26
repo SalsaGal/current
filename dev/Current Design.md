@@ -20,12 +20,16 @@ The `GameData` struct will be accessable by the Game in every function. It is a 
 use current::*;
 
 fn main() {
-    Empty.run();
+    Window::run();
 }
 
-struct Empty;
+struct Window;
 
-impl Game for Empty {}
+impl Game for Window {
+    fn init(_: &mut GameData) -> Self {
+        Self
+    }
+}
 ```
 
 ### Render a rectangle
@@ -35,16 +39,16 @@ use current::*;
 use current::sprite::Sprite;
 
 fn main() {
-    RectangleExample.run();
+    Rect::run();
 }
 
-struct RectangleExample {
+struct Rect {
     sprite: Sprite,
 }
 
-impl Game for RectangleExample {
+impl Game for Rect {
 	fn init(data: &mut GameData) -> Self {
-        let translation = Transfo::scale(0.5, 0.5).with_translation(0.5, 0.0);
+        let transformW = Transform::scale(0.5, 0.5).with_translation(0.5, 0.0);
         self.sprite = Sprite::new_image(&data.graphics, "graphics/test.png").with_transform(transform);
 	}
     
