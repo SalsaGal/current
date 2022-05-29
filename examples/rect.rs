@@ -1,6 +1,7 @@
 use current::*;
 use current::graphics::Frame;
 use current::sprite::Sprite;
+use wgpu::Color;
 
 fn main() {
     Rect::run();
@@ -13,7 +14,7 @@ struct Rect {
 impl Game for Rect {
 	fn init(data: &mut GameData) -> Self {
         Self {
-            rect: Sprite::new_color_rect(data.graphics),
+            rect: Sprite::new_color_rect(data.graphics, Color::GREEN),
         }
 	}
     

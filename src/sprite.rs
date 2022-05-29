@@ -1,7 +1,7 @@
 use std::mem::size_of;
 
 use wgpu::util::{DeviceExt, BufferInitDescriptor};
-use wgpu::{VertexBufferLayout, Buffer};
+use wgpu::{VertexBufferLayout, Buffer, Color};
 
 use crate::graphics::{Graphics, Frame};
 
@@ -9,6 +9,7 @@ use crate::graphics::{Graphics, Frame};
 #[derive(Clone, Copy, Debug, bytemuck::Pod, bytemuck::Zeroable)]
 pub struct ColorVertex {
     pub position: [f32; 3],
+    pub color: [f32; 4],
 }
 
 impl ColorVertex {
@@ -21,6 +22,11 @@ impl ColorVertex {
                     format: wgpu::VertexFormat::Float32x3,
                     offset: 0,
                     shader_location: 0,
+                },
+                wgpu::VertexAttribute {
+                    format: wgpu::VertexFormat::Float32x4,
+                    offset: size_of::<[f32; 3]>() as u64,
+                    shader_location: 1,
                 },
             ],
         }
@@ -35,22 +41,26 @@ pub struct Sprite {
 }
 
 impl Sprite {
-    pub fn new_color_rect(graphics: &Graphics) -> Self {
+    pub fn new_color_rect(graphics: &Graphics, color: Color) -> Self {
         Self {
             vertex_buffer: graphics.device.create_buffer_init(&BufferInitDescriptor {
                 label: None,
                 contents: bytemuck::cast_slice(&[
                     ColorVertex {
                         position: [0.0, 0.0, 0.0],
+                        color: [color.r as f32, color.g as f32, color.b as f32, color.a as f32],
                     },
                     ColorVertex {
                         position: [1.0, 0.0, 0.0],
+                        color: [color.r as f32, color.g as f32, color.b as f32, color.a as f32],
                     },
                     ColorVertex {
                         position: [1.0, 1.0, 0.0],
+                        color: [color.r as f32, color.g as f32, color.b as f32, color.a as f32],
                     },
                     ColorVertex {
                         position: [0.0, 1.0, 0.0],
+                        color: [color.r as f32, color.g as f32, color.b as f32, color.a as f32],
                     },
                 ]),
                 usage: wgpu::BufferUsages::VERTEX,
