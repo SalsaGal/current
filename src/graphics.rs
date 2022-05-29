@@ -1,12 +1,16 @@
-use wgpu::{Device, Queue, SurfaceConfiguration, Surface};
+use wgpu::{Device, Queue, SurfaceConfiguration, Surface, RenderPipeline, Color, RenderPass};
 use winit::dpi::PhysicalSize;
 use winit::window::Window;
 
+use crate::sprite::ColorVertex;
+
 pub struct Graphics {
-    device: Device,
+    pub device: Device,
     queue: Queue,
     surface: Surface,
     config: SurfaceConfiguration,
+
+    color_pipeline: RenderPipeline,
 }
 
 impl Graphics {
@@ -36,12 +40,94 @@ impl Graphics {
         };
         surface.configure(&device, &config);
 
+        let color_shader = device.create_shader_module(&wgpu::ShaderModuleDescriptor {
+            label: Some("color_shader"),
+            source: wgpu::ShaderSource::Wgsl(include_str!("color.wgsl").into()),
+        });
+
+        let color_pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
+            label: None,
+            bind_group_layouts: &[],
+            push_constant_ranges: &[],
+        });
+
+        let color_pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
+            label: Some("color_pipeline"),
+            layout: Some(&color_pipeline_layout),
+            vertex: wgpu::VertexState {
+                module: &color_shader,
+                entry_point: "vertex_main",
+                buffers: &[ColorVertex::desc()],
+            },
+            fragment: Some(wgpu::FragmentState {
+                module: &color_shader,
+                entry_point: "fragment_main",
+                targets: &[wgpu::ColorTargetState {
+                    format: config.format,
+                    blend: Some(wgpu::BlendState::REPLACE),
+                    write_mask: wgpu::ColorWrites::ALL,
+                }],
+            }),
+            primitive: wgpu::PrimitiveState {
+                topology: wgpu::PrimitiveTopology::TriangleList,
+                strip_index_format: None,
+                front_face: wgpu::FrontFace::Ccw,
+                cull_mode: Some(wgpu::Face::Back),
+                unclipped_depth: false,
+                polygon_mode: wgpu::PolygonMode::Fill,
+                conservative: false,
+            },
+            depth_stencil: None,
+            multisample: wgpu::MultisampleState {
+                count: 1,
+                mask: !0,
+                alpha_to_coverage_enabled: false,
+            },
+            multiview: None,
+        });
+
         Self {
             device,
             queue,
             surface,
             config,
+
+            color_pipeline,
         }
+    }
+
+    pub(crate) fn render<F: Fn(Frame)>(&mut self, function: F) {
+        let output = self.surface.get_current_texture().unwrap();
+        let view = output.texture.create_view(&wgpu::TextureViewDescriptor::default());
+
+        let mut encoder = self.device.create_command_encoder(&wgpu::CommandEncoderDescriptor {
+            label: None,
+        });
+
+        {
+            let render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+                label: Some("render_pass"),
+                color_attachments: &[wgpu::RenderPassColorAttachment {
+                    view: &view,
+                    resolve_target: None,
+                    ops: wgpu::Operations {
+                        load: wgpu::LoadOp::Clear(Color::BLACK),
+                        store: true,
+                    },
+                }],
+                depth_stencil_attachment: None,
+            });
+
+            let frame = Frame {
+                render_pass,
+                color_pipeline: &self.color_pipeline,
+            };
+
+            function(frame);
+        }
+
+        self.queue.submit(std::iter::once(encoder.finish()));
+        output.present();
     }
 
     pub(crate) fn resize(&mut self, size: PhysicalSize<u32>) {
@@ -49,4 +135,9 @@ impl Graphics {
         self.config.height = size.height;
         self.surface.configure(&self.device, &self.config);
     }
+}
+
+pub struct Frame<'a> {
+    pub(crate) render_pass: RenderPass<'a>,
+    pub(crate) color_pipeline: &'a RenderPipeline,
 }

@@ -36,6 +36,7 @@ impl Game for Window {
 
 ```rust
 use current::*;
+use current::graphics::Frame;
 use current::sprite::Sprite;
 
 fn main() {
@@ -43,18 +44,18 @@ fn main() {
 }
 
 struct Rect {
-    sprite: Sprite,
+    rect: Sprite,
 }
 
 impl Game for Rect {
 	fn init(data: &mut GameData) -> Self {
-        let transformW = Transform::scale(0.5, 0.5).with_translation(0.5, 0.0);
-        self.sprite = Sprite::new_image(&data.graphics, "graphics/test.png").with_transform(transform);
+        Self {
+            rect: Sprite::new_color_rect(data.graphics),
+        }
 	}
     
-    fn render(&self, data: &mut GameData) {
-        self.sprite.render(data);
+    fn render<'a>(&'a self, mut frame: Frame<'a>) {
+        self.rect.render(&mut frame);
     }
 }
 ```
-

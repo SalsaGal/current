@@ -1,6 +1,7 @@
 pub mod graphics;
+pub mod sprite;
 
-use graphics::Graphics;
+use graphics::{Graphics, Frame};
 use winit::event::{Event, WindowEvent};
 use winit::event_loop::{EventLoop, ControlFlow};
 use winit::window::WindowBuilder;
@@ -11,6 +12,7 @@ pub struct GameData<'a> {
 
 pub trait Game : GameExt {
     fn init(_: &mut GameData) -> Self;
+    fn render<'a>(&'a self, _: Frame<'a>) {}
     fn update(&mut self, _: &mut GameData) {}
 }
 
@@ -42,6 +44,9 @@ impl<T: 'static> GameExt for T where T: Game {
                     let mut game_data = make_game_data!();
                     game.update(&mut game_data);
                     window.request_redraw();
+                },
+                Event::RedrawRequested(..) => {
+                    graphics.render(|pass| game.render(pass));
                 },
                 Event::WindowEvent { event, .. } => {
                     match event {
