@@ -2,7 +2,7 @@ use wgpu::{Device, Queue, SurfaceConfiguration, Surface, RenderPipeline, Color, 
 use winit::dpi::PhysicalSize;
 use winit::window::Window;
 
-use crate::sprite::ColorVertex;
+use crate::sprite::{ColorVertex, Transform};
 
 pub struct Graphics {
     pub device: Device,
@@ -57,7 +57,7 @@ impl Graphics {
             vertex: wgpu::VertexState {
                 module: &color_shader,
                 entry_point: "vertex_main",
-                buffers: &[ColorVertex::desc()],
+                buffers: &[ColorVertex::desc(), Transform::desc()],
             },
             fragment: Some(wgpu::FragmentState {
                 module: &color_shader,
@@ -121,6 +121,7 @@ impl Graphics {
             let frame = Frame {
                 render_pass,
                 color_pipeline: &self.color_pipeline,
+                queue: &self.queue,
             };
 
             function(frame);
@@ -140,4 +141,5 @@ impl Graphics {
 pub struct Frame<'a> {
     pub(crate) render_pass: RenderPass<'a>,
     pub(crate) color_pipeline: &'a RenderPipeline,
+    pub(crate) queue: &'a Queue,
 }
