@@ -29,6 +29,8 @@ impl ColorVertex {
 
 pub struct Sprite {
     vertex_buffer: Buffer,
+    index_buffer: Buffer,
+    index_count: u32,
     ty: SpriteType,
 }
 
@@ -47,9 +49,21 @@ impl Sprite {
                     ColorVertex {
                         position: [1.0, 1.0, 0.0],
                     },
+                    ColorVertex {
+                        position: [0.0, 1.0, 0.0],
+                    },
                 ]),
                 usage: wgpu::BufferUsages::VERTEX,
             }),
+            index_buffer: graphics.device.create_buffer_init(&BufferInitDescriptor {
+                label: None,
+                contents: bytemuck::cast_slice::<u16, u8>(&[
+                    0, 1, 2,
+                    0, 2, 3,
+                ]),
+                usage: wgpu::BufferUsages::INDEX,
+            }),
+            index_count: 6,
             ty: SpriteType::Color,
         }
     }
@@ -59,7 +73,8 @@ impl Sprite {
             SpriteType::Color => {
                 frame.render_pass.set_pipeline(frame.color_pipeline);
                 frame.render_pass.set_vertex_buffer(0, self.vertex_buffer.slice(..));
-                frame.render_pass.draw(0..3, 0..1);
+                frame.render_pass.set_index_buffer(self.index_buffer.slice(..), wgpu::IndexFormat::Uint16);
+                frame.render_pass.draw_indexed(0..self.index_count, 0, 0..1);
             },
         }
     }
