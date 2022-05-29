@@ -1,13 +1,17 @@
 pub mod graphics;
 pub mod sprite;
+pub mod input;
 
 use graphics::{Graphics, Frame};
 use winit::event::{Event, WindowEvent};
 use winit::event_loop::{EventLoop, ControlFlow};
 use winit::window::WindowBuilder;
 
+use crate::input::Input;
+
 pub struct GameData<'a> {
     pub graphics: &'a mut Graphics,
+    pub input: &'a Input,
 }
 
 pub trait Game : GameExt {
@@ -26,11 +30,13 @@ impl<T: 'static> GameExt for T where T: Game {
         let window = WindowBuilder::new().build(&event_loop).unwrap();
 
         let mut graphics = pollster::block_on(Graphics::new(&window));
+        let mut input = Input::new();
 
         macro_rules! make_game_data {
             () => {
                 GameData {
                     graphics: &mut graphics,
+                    input: &input,
                 }
             };
         }
@@ -43,6 +49,7 @@ impl<T: 'static> GameExt for T where T: Game {
                 Event::MainEventsCleared => {
                     let mut game_data = make_game_data!();
                     game.update(&mut game_data);
+                    input.update();
                     window.request_redraw();
                 },
                 Event::RedrawRequested(..) => {
@@ -51,6 +58,7 @@ impl<T: 'static> GameExt for T where T: Game {
                 Event::WindowEvent { event, .. } => {
                     match event {
                         WindowEvent::CloseRequested => *control_flow = ControlFlow::Exit,
+                        WindowEvent::KeyboardInput { input: event, .. } => input.handle(event),
                         WindowEvent::Resized(size) => graphics.resize(size),
                         WindowEvent::ScaleFactorChanged { new_inner_size, .. } => graphics.resize(*new_inner_size),
                         _ => {},
