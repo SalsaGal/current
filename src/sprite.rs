@@ -130,7 +130,7 @@ enum SpriteType {
     Color,
 }
 
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct Transform {
     pub translation: Vec3,
     pub rotation: Quat,
@@ -138,6 +138,27 @@ pub struct Transform {
 }
 
 impl Transform {
+    pub fn with_translation(mut self, translation: Vec3) -> Self {
+        self.translation = translation;
+        self
+    }
+
+    pub fn with_rotation(mut self, rotation: Quat) -> Self {
+        self.rotation = rotation;
+        self
+    }
+
+    pub fn with_scale(mut self, scale: Vec3) -> Self {
+        self.scale = scale;
+        self
+    }
+
+    pub fn with_translation_centered(mut self, translation: Vec3) -> Self {
+        let offset = self.scale / 2.0;
+        self.translation = translation - offset;
+        self
+    }
+
     fn matrix(&self) -> [[f32; 4]; 4] {
         Mat4::from_scale_rotation_translation(self.scale, self.rotation, self.translation).to_cols_array_2d()
     }

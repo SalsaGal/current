@@ -29,11 +29,9 @@ impl Game for Rect {
     fn update(&mut self, data: &mut GameData) {
         if data.input.is_key(17, InputState::Pressed) {
             self.i += 0.25;
-            self.rect.set_transform(Transform {
-                translation: Vec3::new(-self.i / 2.0, -self.i / 2.0, 0.0),
-                scale: Vec3::new(self.i, self.i, 1.0),
-                ..Default::default()
-            });
+            let mut transform = self.rect.transform;
+            transform = transform.with_scale(Vec3::new(self.i, self.i, 0.0)).with_translation_centered(Vec3::ZERO);
+            self.rect.set_transform(transform);
         }
     }
     
