@@ -42,6 +42,7 @@ pub struct Sprite {
 
     pub transform: Transform,
     transform_buffer: Buffer,
+    // TODO Move this bool to just updating it after changing it
     transform_outdated: bool,
 }
 
@@ -111,6 +112,11 @@ impl Sprite {
                 frame.render_pass.draw_indexed(0..self.index_count, 0, 0..1);
             },
         }
+    }
+
+    pub fn set_transform(&mut self, transform: Transform) {
+        self.transform = transform;
+        self.transform_outdated = true;
     }
 
     pub fn with_transform(mut self, transform: Transform) -> Self {

@@ -13,6 +13,15 @@ impl Input {
         }
     }
 
+    pub fn is_key(&self, key: ScanCode, state: InputState) -> bool {
+        let actual = *self.keys.get(&key).unwrap_or(&InputState::Up);
+        match state {
+            InputState::Down => actual == state || actual == InputState::Pressed,
+            InputState::Up => actual == state || actual == InputState::Released,
+            _ => actual == state,
+        }
+    }
+
     pub(crate) fn update(&mut self) {
         self.keys.iter_mut().for_each(|(_, state)| {
             match state {

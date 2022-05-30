@@ -12,6 +12,7 @@ use crate::input::Input;
 pub struct GameData<'a> {
     pub graphics: &'a mut Graphics,
     pub input: &'a Input,
+    // TODO Add delta time
 }
 
 pub trait Game : GameExt {
