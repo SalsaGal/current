@@ -41,9 +41,8 @@ pub struct Sprite {
     ty: SpriteType,
 
     pub transform: Transform,
+    pub transform_outdated: bool,
     transform_buffer: Buffer,
-    // TODO Move this bool to just updating it after changing it
-    transform_outdated: bool,
 }
 
 impl Sprite {
