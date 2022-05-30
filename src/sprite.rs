@@ -1,6 +1,6 @@
 use std::mem::size_of;
 
-use glam::{Vec3, Quat, Mat4};
+use glam::{Vec3, Quat, Mat4, Vec2};
 use wgpu::util::{DeviceExt, BufferInitDescriptor};
 use wgpu::{VertexBufferLayout, Buffer, Color, VertexAttribute};
 
@@ -48,11 +48,7 @@ pub struct Sprite {
 
 impl Sprite {
     pub fn new_color_rect(graphics: &Graphics, color: Color) -> Self {
-        let transform = Transform {
-            translation: Vec3::ZERO,
-            rotation: Quat::IDENTITY,
-            scale: Vec3::ONE,
-        };
+        let transform = Transform::default();
 
         Self {
             vertex_buffer: graphics.device.create_buffer_init(&BufferInitDescriptor {
@@ -134,7 +130,7 @@ enum SpriteType {
 pub struct Transform {
     pub translation: Vec3,
     pub rotation: Quat,
-    pub scale: Vec3,
+    pub scale: Vec2,
 }
 
 impl Transform {
@@ -148,19 +144,19 @@ impl Transform {
         self
     }
 
-    pub fn with_scale(mut self, scale: Vec3) -> Self {
+    pub fn with_scale(mut self, scale: Vec2) -> Self {
         self.scale = scale;
         self
     }
 
     pub fn with_translation_centered(mut self, translation: Vec3) -> Self {
         let offset = self.scale / 2.0;
-        self.translation = translation - offset;
+        self.translation = translation - offset.extend(0.0);
         self
     }
 
     fn matrix(&self) -> [[f32; 4]; 4] {
-        Mat4::from_scale_rotation_translation(self.scale, self.rotation, self.translation).to_cols_array_2d()
+        Mat4::from_scale_rotation_translation(self.scale.extend(1.0), self.rotation, self.translation).to_cols_array_2d()
     }
 
     pub(crate) fn desc<'a>() -> VertexBufferLayout<'a> {
@@ -195,6 +191,6 @@ impl Transform {
 
 impl Default for Transform {
     fn default() -> Self {
-        Self { translation: Vec3::ZERO, rotation: Quat::IDENTITY, scale: Vec3::ONE }
+        Self { translation: Vec3::ZERO, rotation: Quat::IDENTITY, scale: Vec2::ONE }
     }
 }
