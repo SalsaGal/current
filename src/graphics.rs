@@ -96,7 +96,7 @@ impl Graphics {
         }
     }
 
-    pub(crate) fn render<F: Fn(Frame)>(&mut self, function: F) {
+    pub(crate) fn render<F: FnMut(Frame)>(&mut self, mut function: F) {
         let output = self.surface.get_current_texture().unwrap();
         let view = output.texture.create_view(&wgpu::TextureViewDescriptor::default());
 

@@ -22,7 +22,7 @@ impl Game for Rect {
         }
 	}
     
-    fn render<'a>(&'a self, mut frame: Frame<'a>) {
+    fn render<'a>(&'a mut self, mut frame: Frame<'a>) {
         self.rect.render(&mut frame);
     }
 }
