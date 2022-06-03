@@ -1,7 +1,7 @@
-use current::*;
 use current::graphics::Frame;
 use current::input::InputState;
 use current::sprite::{Sprite, Transform};
+use current::*;
 use glam::Vec2;
 use wgpu::Color;
 
@@ -15,7 +15,7 @@ struct Rect {
 }
 
 impl Game for Rect {
-	fn init(data: &mut GameData) -> Self {
+    fn init(data: &mut GameData) -> Self {
         Self {
             rect: Sprite::new_color_rect(data.graphics, Color::RED).with_transform(Transform {
                 scale: Vec2::new(0.25, 0.25),
@@ -23,7 +23,7 @@ impl Game for Rect {
             }),
             i: 0.25,
         }
-	}
+    }
 
     fn update(&mut self, data: &mut GameData) {
         if data.input.is_key(17, InputState::Pressed) {
@@ -33,8 +33,8 @@ impl Game for Rect {
             self.rect.set_transform(transform);
         }
     }
-    
+
     fn render<'a>(&'a mut self, mut frame: Frame<'a>) {
-        self.rect.render(&mut frame);
+        self.rect.render_to(&mut frame);
     }
 }

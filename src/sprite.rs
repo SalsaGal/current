@@ -1,10 +1,10 @@
 use std::mem::size_of;
 
-use glam::{Vec3, Quat, Mat4, Vec2};
-use wgpu::util::{DeviceExt, BufferInitDescriptor};
-use wgpu::{VertexBufferLayout, Buffer, Color, VertexAttribute};
+use glam::{Mat4, Quat, Vec2, Vec3};
+use wgpu::util::{BufferInitDescriptor, DeviceExt};
+use wgpu::{Buffer, Color, VertexAttribute, VertexBufferLayout};
 
-use crate::graphics::{Graphics, Frame};
+use crate::graphics::{Frame, Graphics};
 
 #[repr(C)]
 #[derive(Clone, Copy, Debug, bytemuck::Pod, bytemuck::Zeroable)]
@@ -83,29 +83,46 @@ impl Sprite {
                 contents: bytemuck::cast_slice(&[
                     ColorVertex {
                         position: [-1.0, -1.0, 0.0],
-                        color: [color.r as f32, color.g as f32, color.b as f32, color.a as f32],
+                        color: [
+                            color.r as f32,
+                            color.g as f32,
+                            color.b as f32,
+                            color.a as f32,
+                        ],
                     },
                     ColorVertex {
                         position: [1.0, -1.0, 0.0],
-                        color: [color.r as f32, color.g as f32, color.b as f32, color.a as f32],
+                        color: [
+                            color.r as f32,
+                            color.g as f32,
+                            color.b as f32,
+                            color.a as f32,
+                        ],
                     },
                     ColorVertex {
                         position: [1.0, 1.0, 0.0],
-                        color: [color.r as f32, color.g as f32, color.b as f32, color.a as f32],
+                        color: [
+                            color.r as f32,
+                            color.g as f32,
+                            color.b as f32,
+                            color.a as f32,
+                        ],
                     },
                     ColorVertex {
                         position: [-1.0, 1.0, 0.0],
-                        color: [color.r as f32, color.g as f32, color.b as f32, color.a as f32],
+                        color: [
+                            color.r as f32,
+                            color.g as f32,
+                            color.b as f32,
+                            color.a as f32,
+                        ],
                     },
                 ]),
                 usage: wgpu::BufferUsages::VERTEX,
             }),
             index_buffer: graphics.device.create_buffer_init(&BufferInitDescriptor {
                 label: None,
-                contents: bytemuck::cast_slice::<u16, u8>(&[
-                    0, 1, 2,
-                    0, 2, 3,
-                ]),
+                contents: bytemuck::cast_slice::<u16, u8>(&[0, 1, 2, 0, 2, 3]),
                 usage: wgpu::BufferUsages::INDEX,
             }),
             index_count: 6,
@@ -149,10 +166,7 @@ impl Sprite {
             }),
             index_buffer: graphics.device.create_buffer_init(&BufferInitDescriptor {
                 label: None,
-                contents: bytemuck::cast_slice::<u16, u8>(&[
-                    0, 1, 2,
-                    0, 2, 3,
-                ]),
+                contents: bytemuck::cast_slice::<u16, u8>(&[0, 1, 2, 0, 2, 3]),
                 usage: wgpu::BufferUsages::INDEX,
             }),
             index_count: 6,
@@ -168,27 +182,42 @@ impl Sprite {
         }
     }
 
-    pub fn render<'a>(&'a self, frame: &mut Frame<'a>) {
+    pub fn render_to<'a>(&'a self, frame: &mut Frame<'a>) {
         if self.transform_outdated {
-            frame.queue.write_buffer(&self.transform_buffer, 0, bytemuck::cast_slice(&[self.transform.matrix()]));
+            frame.queue.write_buffer(
+                &self.transform_buffer,
+                0,
+                bytemuck::cast_slice(&[self.transform.matrix()]),
+            );
         }
 
         match self.ty {
             SpriteType::Color => {
                 frame.render_pass.set_pipeline(frame.color_pipeline);
-                frame.render_pass.set_vertex_buffer(0, self.vertex_buffer.slice(..));
-                frame.render_pass.set_vertex_buffer(1, self.transform_buffer.slice(..));
-                frame.render_pass.set_index_buffer(self.index_buffer.slice(..), wgpu::IndexFormat::Uint16);
+                frame
+                    .render_pass
+                    .set_vertex_buffer(0, self.vertex_buffer.slice(..));
+                frame
+                    .render_pass
+                    .set_vertex_buffer(1, self.transform_buffer.slice(..));
+                frame
+                    .render_pass
+                    .set_index_buffer(self.index_buffer.slice(..), wgpu::IndexFormat::Uint16);
                 frame.render_pass.draw_indexed(0..self.index_count, 0, 0..1);
-            },
+            }
             SpriteType::Texture => {
                 frame.render_pass.set_pipeline(frame.texture_pipeline);
-                frame.render_pass.set_vertex_buffer(0, self.vertex_buffer.slice(..));
-                frame.render_pass.set_vertex_buffer(1, self.transform_buffer.slice(..));
-                frame.render_pass.set_index_buffer(self.index_buffer.slice(..), wgpu::IndexFormat::Uint16);
+                frame
+                    .render_pass
+                    .set_vertex_buffer(0, self.vertex_buffer.slice(..));
+                frame
+                    .render_pass
+                    .set_vertex_buffer(1, self.transform_buffer.slice(..));
+                frame
+                    .render_pass
+                    .set_index_buffer(self.index_buffer.slice(..), wgpu::IndexFormat::Uint16);
                 frame.render_pass.draw_indexed(0..self.index_count, 0, 0..1);
-            },
-            
+            }
         }
     }
 
@@ -239,7 +268,12 @@ impl Transform {
     }
 
     fn matrix(&self) -> [[f32; 4]; 4] {
-        Mat4::from_scale_rotation_translation(self.scale.extend(1.0), self.rotation, self.translation).to_cols_array_2d()
+        Mat4::from_scale_rotation_translation(
+            self.scale.extend(1.0),
+            self.rotation,
+            self.translation,
+        )
+        .to_cols_array_2d()
     }
 
     pub(crate) fn desc<'a>() -> VertexBufferLayout<'a> {
@@ -274,6 +308,10 @@ impl Transform {
 
 impl Default for Transform {
     fn default() -> Self {
-        Self { translation: Vec3::ZERO, rotation: Quat::IDENTITY, scale: Vec2::ONE }
+        Self {
+            translation: Vec3::ZERO,
+            rotation: Quat::IDENTITY,
+            scale: Vec2::ONE,
+        }
     }
 }

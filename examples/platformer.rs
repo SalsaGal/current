@@ -25,7 +25,7 @@ impl Game for Platformer {
 
     fn render<'a>(&'a mut self, mut frame: graphics::Frame<'a>) {
         self.player.update_sprite();
-        self.player.sprite.render(&mut frame);
+        self.player.sprite.render_to(&mut frame);
     }
 }
 
