@@ -2,7 +2,7 @@ use wgpu::{Device, Queue, SurfaceConfiguration, Surface, RenderPipeline, Color, 
 use winit::dpi::PhysicalSize;
 use winit::window::Window;
 
-use crate::sprite::{ColorVertex, Transform};
+use crate::sprite::{ColorVertex, Transform, TextureVertex};
 
 pub struct Graphics {
     pub device: Device,
@@ -11,6 +11,7 @@ pub struct Graphics {
     config: SurfaceConfiguration,
 
     color_pipeline: RenderPipeline,
+    texture_pipeline: RenderPipeline,
 }
 
 impl Graphics {
@@ -86,6 +87,52 @@ impl Graphics {
             multiview: None,
         });
 
+        let texture_shader = device.create_shader_module(&wgpu::ShaderModuleDescriptor {
+            label: Some("texture_shader"),
+            source: wgpu::ShaderSource::Wgsl(include_str!("texture.wgsl").into()),
+        });
+
+        let texture_pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
+            label: None,
+            bind_group_layouts: &[],
+            push_constant_ranges: &[],
+        });
+
+        let texture_pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
+            label: Some("texture_pipeline"),
+            layout: Some(&texture_pipeline_layout),
+            vertex: wgpu::VertexState {
+                module: &texture_shader,
+                entry_point: "vertex_main",
+                buffers: &[TextureVertex::desc(), Transform::desc()],
+            },
+            fragment: Some(wgpu::FragmentState {
+                module: &texture_shader,
+                entry_point: "fragment_main",
+                targets: &[wgpu::ColorTargetState {
+                    format: config.format,
+                    blend: Some(wgpu::BlendState::REPLACE),
+                    write_mask: wgpu::ColorWrites::ALL,
+                }],
+            }),
+            primitive: wgpu::PrimitiveState {
+                topology: wgpu::PrimitiveTopology::TriangleList,
+                strip_index_format: None,
+                front_face: wgpu::FrontFace::Ccw,
+                cull_mode: Some(wgpu::Face::Back),
+                unclipped_depth: false,
+                polygon_mode: wgpu::PolygonMode::Fill,
+                conservative: false,
+            },
+            depth_stencil: None,
+            multisample: wgpu::MultisampleState {
+                count: 1,
+                mask: !0,
+                alpha_to_coverage_enabled: false,
+            },
+            multiview: None,
+        });
+
         Self {
             device,
             queue,
@@ -93,6 +140,7 @@ impl Graphics {
             config,
 
             color_pipeline,
+            texture_pipeline,
         }
     }
 
@@ -121,6 +169,7 @@ impl Graphics {
             let frame = Frame {
                 render_pass,
                 color_pipeline: &self.color_pipeline,
+                texture_pipeline: &self.texture_pipeline,
                 queue: &self.queue,
             };
 
@@ -141,5 +190,6 @@ impl Graphics {
 pub struct Frame<'a> {
     pub(crate) render_pass: RenderPass<'a>,
     pub(crate) color_pipeline: &'a RenderPipeline,
+    pub(crate) texture_pipeline: &'a RenderPipeline,
     pub(crate) queue: &'a Queue,
 }

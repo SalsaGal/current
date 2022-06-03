@@ -34,6 +34,34 @@ impl ColorVertex {
     }
 }
 
+#[repr(C)]
+#[derive(Clone, Copy, Debug, bytemuck::Pod, bytemuck::Zeroable)]
+pub struct TextureVertex {
+    pub position: [f32; 3],
+    pub tex_coords: [f32; 2],
+}
+
+impl TextureVertex {
+    pub(crate) fn desc<'a>() -> VertexBufferLayout<'a> {
+        VertexBufferLayout {
+            array_stride: size_of::<Self>() as u64,
+            step_mode: wgpu::VertexStepMode::Vertex,
+            attributes: &[
+                VertexAttribute {
+                    format: wgpu::VertexFormat::Float32x3,
+                    offset: 0,
+                    shader_location: 0,
+                },
+                VertexAttribute {
+                    format: wgpu::VertexFormat::Float32x2,
+                    offset: size_of::<[f32; 3]>() as u64,
+                    shader_location: 1,
+                },
+            ],
+        }
+    }
+}
+
 pub struct Sprite {
     vertex_buffer: Buffer,
     index_buffer: Buffer,
@@ -93,6 +121,53 @@ impl Sprite {
         }
     }
 
+    pub fn new_texture_rect(graphics: &Graphics) -> Self {
+        let transform = Transform::default();
+
+        Self {
+            vertex_buffer: graphics.device.create_buffer_init(&BufferInitDescriptor {
+                label: None,
+                contents: bytemuck::cast_slice(&[
+                    TextureVertex {
+                        position: [-1.0, -1.0, 0.0],
+                        tex_coords: [0.0, 0.0],
+                    },
+                    TextureVertex {
+                        position: [1.0, -1.0, 0.0],
+                        tex_coords: [1.0, 0.0],
+                    },
+                    TextureVertex {
+                        position: [1.0, 1.0, 0.0],
+                        tex_coords: [1.0, 1.0],
+                    },
+                    TextureVertex {
+                        position: [-1.0, 1.0, 0.0],
+                        tex_coords: [0.0, 1.0],
+                    },
+                ]),
+                usage: wgpu::BufferUsages::VERTEX,
+            }),
+            index_buffer: graphics.device.create_buffer_init(&BufferInitDescriptor {
+                label: None,
+                contents: bytemuck::cast_slice::<u16, u8>(&[
+                    0, 1, 2,
+                    0, 2, 3,
+                ]),
+                usage: wgpu::BufferUsages::INDEX,
+            }),
+            index_count: 6,
+            ty: SpriteType::Texture,
+
+            transform_buffer: graphics.device.create_buffer_init(&BufferInitDescriptor {
+                label: None,
+                contents: bytemuck::cast_slice(&[transform.matrix()]),
+                usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
+            }),
+            transform,
+            transform_outdated: false,
+        }
+    }
+
     pub fn render<'a>(&'a self, frame: &mut Frame<'a>) {
         if self.transform_outdated {
             frame.queue.write_buffer(&self.transform_buffer, 0, bytemuck::cast_slice(&[self.transform.matrix()]));
@@ -106,6 +181,14 @@ impl Sprite {
                 frame.render_pass.set_index_buffer(self.index_buffer.slice(..), wgpu::IndexFormat::Uint16);
                 frame.render_pass.draw_indexed(0..self.index_count, 0, 0..1);
             },
+            SpriteType::Texture => {
+                frame.render_pass.set_pipeline(frame.texture_pipeline);
+                frame.render_pass.set_vertex_buffer(0, self.vertex_buffer.slice(..));
+                frame.render_pass.set_vertex_buffer(1, self.transform_buffer.slice(..));
+                frame.render_pass.set_index_buffer(self.index_buffer.slice(..), wgpu::IndexFormat::Uint16);
+                frame.render_pass.draw_indexed(0..self.index_count, 0, 0..1);
+            },
+            
         }
     }
 
@@ -123,6 +206,7 @@ impl Sprite {
 
 enum SpriteType {
     Color,
+    Texture,
 }
 
 #[derive(Clone, Copy, Debug)]

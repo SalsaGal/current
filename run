@@ -1,2 +1,2 @@
 [default]
-cargo run --example input
+cargo run --example image
