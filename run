@@ -1,2 +1,2 @@
 [default]
-cargo run --example platformer
+cargo run --example input

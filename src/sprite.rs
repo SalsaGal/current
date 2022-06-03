@@ -54,11 +54,11 @@ impl Sprite {
                 label: None,
                 contents: bytemuck::cast_slice(&[
                     ColorVertex {
-                        position: [0.0, 0.0, 0.0],
+                        position: [-1.0, -1.0, 0.0],
                         color: [color.r as f32, color.g as f32, color.b as f32, color.a as f32],
                     },
                     ColorVertex {
-                        position: [1.0, 0.0, 0.0],
+                        position: [1.0, -1.0, 0.0],
                         color: [color.r as f32, color.g as f32, color.b as f32, color.a as f32],
                     },
                     ColorVertex {
@@ -66,7 +66,7 @@ impl Sprite {
                         color: [color.r as f32, color.g as f32, color.b as f32, color.a as f32],
                     },
                     ColorVertex {
-                        position: [0.0, 1.0, 0.0],
+                        position: [-1.0, 1.0, 0.0],
                         color: [color.r as f32, color.g as f32, color.b as f32, color.a as f32],
                     },
                 ]),

@@ -39,7 +39,7 @@ impl Player {
     fn new(data: &mut GameData) -> Self {
         let sprite = Sprite::new_color_rect(data.graphics, Color::RED)
             .with_transform(Transform::default()
-                .with_scale(Vec2::new(1.0 / 8.0, 1.0 / 8.0))
+                .with_scale(Vec2::new(1.0 / 16.0, 1.0 / 16.0))
                 .with_translation_centered(Vec3::ZERO)
             );
 

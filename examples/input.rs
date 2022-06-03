@@ -2,7 +2,7 @@ use current::*;
 use current::graphics::Frame;
 use current::input::InputState;
 use current::sprite::{Sprite, Transform};
-use glam::{Vec3, Vec2};
+use glam::Vec2;
 use wgpu::Color;
 
 fn main() {
@@ -18,11 +18,10 @@ impl Game for Rect {
 	fn init(data: &mut GameData) -> Self {
         Self {
             rect: Sprite::new_color_rect(data.graphics, Color::RED).with_transform(Transform {
-                translation: Vec3::new(-0.25, -0.25, 0.0),
-                scale: Vec2::new(0.5, 0.5),
+                scale: Vec2::new(0.25, 0.25),
                 ..Default::default()
             }),
-            i: 0.5,
+            i: 0.25,
         }
 	}
 
@@ -30,7 +29,7 @@ impl Game for Rect {
         if data.input.is_key(17, InputState::Pressed) {
             self.i += 0.25;
             let mut transform = self.rect.transform;
-            transform = transform.with_scale(Vec2::new(self.i, self.i)).with_translation_centered(Vec3::ZERO);
+            transform = transform.with_scale(Vec2::new(self.i, self.i));
             self.rect.set_transform(transform);
         }
     }

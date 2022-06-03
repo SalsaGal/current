@@ -1,7 +1,7 @@
 use current::*;
 use current::graphics::Frame;
 use current::sprite::{Sprite, Transform};
-use glam::Vec3;
+use glam::Vec2;
 use wgpu::Color;
 
 fn main() {
@@ -16,7 +16,7 @@ impl Game for Rect {
 	fn init(data: &mut GameData) -> Self {
         Self {
             rect: Sprite::new_color_rect(data.graphics, Color::GREEN).with_transform(Transform {
-                translation: Vec3::new(-0.5, -0.5, 0.0),
+                scale: Vec2::new(0.5, 0.5),
                 ..Default::default()
             }),
         }
