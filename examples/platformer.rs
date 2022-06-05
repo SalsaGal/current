@@ -1,5 +1,5 @@
-use current::*;
 use current::sprite::{Sprite, Transform};
+use current::*;
 use glam::{Vec2, Vec3};
 use wgpu::Color;
 
@@ -37,11 +37,11 @@ struct Player {
 
 impl Player {
     fn new(data: &mut GameData) -> Self {
-        let sprite = Sprite::new_color_rect(data.graphics, Color::RED)
-            .with_transform(Transform::default()
+        let sprite = Sprite::new_color_rect(data.graphics, Color::RED).with_transform(
+            Transform::default()
                 .with_scale(Vec2::new(1.0 / 16.0, 1.0 / 16.0))
-                .with_translation_centered(Vec3::ZERO)
-            );
+                .with_translation_centered(Vec3::ZERO),
+        );
 
         Self {
             pos: Vec2::ZERO,

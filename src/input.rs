@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use winit::event::{ScanCode, KeyboardInput};
+use winit::event::{KeyboardInput, ScanCode};
 
 pub struct Input {
     keys: HashMap<ScanCode, InputState>,
@@ -23,14 +23,12 @@ impl Input {
     }
 
     pub(crate) fn update(&mut self) {
-        self.keys.iter_mut().for_each(|(_, state)| {
-            match state {
-                InputState::Pressed => *state = InputState::Down,
-                InputState::Released => *state = InputState::Up,
-                _ => {},
-            }
+        self.keys.iter_mut().for_each(|(_, state)| match state {
+            InputState::Pressed => *state = InputState::Down,
+            InputState::Released => *state = InputState::Up,
+            _ => {}
         });
-        self.keys.retain(|_, state| { *state != InputState::Released });
+        self.keys.retain(|_, state| *state != InputState::Released);
     }
 
     pub(crate) fn handle(&mut self, input: KeyboardInput) {
@@ -39,10 +37,10 @@ impl Input {
                 if self.keys.get(&input.scancode) != Some(&InputState::Down) {
                     self.keys.insert(input.scancode, InputState::Pressed);
                 }
-            },
+            }
             winit::event::ElementState::Released => {
                 self.keys.insert(input.scancode, InputState::Released);
-            },
+            }
         }
     }
 }

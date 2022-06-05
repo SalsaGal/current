@@ -3,11 +3,14 @@ use std::ops::Index;
 
 use image::{DynamicImage, GenericImageView};
 use indexmap::IndexMap;
-use wgpu::{Device, Queue, SurfaceConfiguration, Surface, RenderPipeline, Color, RenderPass, BindGroup, BindGroupLayout, Sampler};
+use wgpu::{
+    BindGroup, BindGroupLayout, Color, Device, Queue, RenderPass, RenderPipeline, Sampler, Surface,
+    SurfaceConfiguration,
+};
 use winit::dpi::PhysicalSize;
 use winit::window::Window;
 
-use crate::sprite::{ColorVertex, Transform, TextureVertex};
+use crate::sprite::{ColorVertex, TextureVertex, Transform};
 
 pub struct Graphics {
     pub device: Device,
@@ -26,18 +29,27 @@ impl Graphics {
         let size = window.inner_size();
 
         let instance = wgpu::Instance::new(wgpu::Backends::all());
-        let surface = unsafe {instance.create_surface(&window)};
-        let adapter = instance.request_adapter(&wgpu::RequestAdapterOptions {
-            power_preference: wgpu::PowerPreference::default(),
-            force_fallback_adapter: false,
-            compatible_surface: Some(&surface),
-        }).await.unwrap();
+        let surface = unsafe { instance.create_surface(&window) };
+        let adapter = instance
+            .request_adapter(&wgpu::RequestAdapterOptions {
+                power_preference: wgpu::PowerPreference::default(),
+                force_fallback_adapter: false,
+                compatible_surface: Some(&surface),
+            })
+            .await
+            .unwrap();
 
-        let (device, queue) = adapter.request_device(&wgpu::DeviceDescriptor {
-            label: None,
-            features: wgpu::Features::empty(),
-            limits: wgpu::Limits::default(),
-        }, None).await.unwrap();
+        let (device, queue) = adapter
+            .request_device(
+                &wgpu::DeviceDescriptor {
+                    label: None,
+                    features: wgpu::Features::empty(),
+                    limits: wgpu::Limits::default(),
+                },
+                None,
+            )
+            .await
+            .unwrap();
 
         let config = wgpu::SurfaceConfiguration {
             usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
@@ -49,18 +61,23 @@ impl Graphics {
         surface.configure(&device, &config);
 
         let mut texture_manager = TextureManager::new(&device);
-        texture_manager.make_texture(&device, &queue, image::load_from_memory(include_bytes!("error.png")).unwrap());
+        texture_manager.make_texture(
+            &device,
+            &queue,
+            image::load_from_memory(include_bytes!("error.png")).unwrap(),
+        );
 
         let color_shader = device.create_shader_module(&wgpu::ShaderModuleDescriptor {
             label: Some("color_shader"),
             source: wgpu::ShaderSource::Wgsl(include_str!("color.wgsl").into()),
         });
 
-        let color_pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
-            label: None,
-            bind_group_layouts: &[],
-            push_constant_ranges: &[],
-        });
+        let color_pipeline_layout =
+            device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
+                label: None,
+                bind_group_layouts: &[],
+                push_constant_ranges: &[],
+            });
 
         let color_pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
             label: Some("color_pipeline"),
@@ -102,11 +119,12 @@ impl Graphics {
             source: wgpu::ShaderSource::Wgsl(include_str!("texture.wgsl").into()),
         });
 
-        let texture_pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
-            label: None,
-            bind_group_layouts: &[&texture_manager.bind_group_layout],
-            push_constant_ranges: &[],
-        });
+        let texture_pipeline_layout =
+            device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
+                label: None,
+                bind_group_layouts: &[&texture_manager.bind_group_layout],
+                push_constant_ranges: &[],
+            });
 
         let texture_pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
             label: Some("texture_pipeline"),
@@ -158,11 +176,13 @@ impl Graphics {
 
     pub(crate) fn render<F: FnMut(Frame)>(&mut self, mut function: F) {
         let output = self.surface.get_current_texture().unwrap();
-        let view = output.texture.create_view(&wgpu::TextureViewDescriptor::default());
+        let view = output
+            .texture
+            .create_view(&wgpu::TextureViewDescriptor::default());
 
-        let mut encoder = self.device.create_command_encoder(&wgpu::CommandEncoderDescriptor {
-            label: None,
-        });
+        let mut encoder = self
+            .device
+            .create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None });
 
         {
             let render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
@@ -260,7 +280,12 @@ impl TextureManager {
         }
     }
 
-    pub fn make_texture(&mut self, device: &Device, queue: &Queue, image: DynamicImage) -> TextureID {
+    pub fn make_texture(
+        &mut self,
+        device: &Device,
+        queue: &Queue,
+        image: DynamicImage,
+    ) -> TextureID {
         let (width, height) = image.dimensions();
 
         let size = wgpu::Extent3d {
@@ -301,7 +326,9 @@ impl TextureManager {
             entries: &[
                 wgpu::BindGroupEntry {
                     binding: 0,
-                    resource: wgpu::BindingResource::TextureView(&texture.create_view(&wgpu::TextureViewDescriptor::default())),
+                    resource: wgpu::BindingResource::TextureView(
+                        &texture.create_view(&wgpu::TextureViewDescriptor::default()),
+                    ),
                 },
                 wgpu::BindGroupEntry {
                     binding: 1,
