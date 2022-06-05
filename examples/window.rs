@@ -1,7 +1,9 @@
 use current::*;
 
 fn main() {
-    Window::run();
+    Window::run(GameInit {
+        window_title: "Window Title",
+    });
 }
 
 struct Window;

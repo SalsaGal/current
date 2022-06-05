@@ -5,7 +5,7 @@ use glam::Vec2;
 use wgpu::Color;
 
 fn main() {
-    Rect::run();
+    Rect::run(GameInit::default());
 }
 
 struct Rect {

@@ -20,7 +20,7 @@ The `GameData` struct will be accessable by the Game in every function. It is a 
 use current::*;
 
 fn main() {
-    Window::run();
+    Window::run(GameInit::default());
 }
 
 struct Window;

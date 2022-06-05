@@ -11,6 +11,11 @@ use winit::window::WindowBuilder;
 
 use crate::input::Input;
 
+#[derive(Default)]
+pub struct GameInit {
+    pub window_title: &'static str
+}
+
 pub struct GameData<'a> {
     pub graphics: &'a mut Graphics,
     pub input: &'a Input,
@@ -27,16 +32,19 @@ pub trait GameExt
 where
     Self: Sized,
 {
-    fn run() -> !;
+    fn run(init: GameInit) -> !;
 }
 
 impl<T: 'static> GameExt for T
 where
     T: Game,
 {
-    fn run() -> ! {
+    fn run(init: GameInit) -> ! {
         let event_loop = EventLoop::new();
-        let window = WindowBuilder::new().build(&event_loop).unwrap();
+        let window = WindowBuilder::new()
+            .with_title(init.window_title)
+            .build(&event_loop)
+            .unwrap();
 
         let mut graphics = pollster::block_on(Graphics::new(&window));
         let mut input = Input::new();
