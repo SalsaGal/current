@@ -216,6 +216,9 @@ impl Sprite {
                 frame
                     .render_pass
                     .set_index_buffer(self.index_buffer.slice(..), wgpu::IndexFormat::Uint16);
+                frame
+                    .render_pass
+                    .set_bind_group(0, &frame.texture_manager[0], &[]);
                 frame.render_pass.draw_indexed(0..self.index_count, 0, 0..1);
             }
         }

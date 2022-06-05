@@ -30,7 +30,12 @@ fn vertex_main(vertex: VertexInput, transform: Transform) -> VertexOutput {
     return output;
 }
 
+[[group(0), binding(0)]]
+var texture: texture_2d<f32>;
+[[group(0), binding(1)]]
+var texture_sampler: sampler;
+
 [[stage(fragment)]]
 fn fragment_main(vertex: VertexOutput) -> [[location(0)]] vec4<f32> {
-    return vec4<f32>(1.0, 0.0, 1.0, 1.0);
+    return textureSample(texture, texture_sampler, vertex.tex_coords);
 }

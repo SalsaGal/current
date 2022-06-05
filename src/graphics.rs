@@ -1,4 +1,9 @@
-use wgpu::{Device, Queue, SurfaceConfiguration, Surface, RenderPipeline, Color, RenderPass};
+use std::num::NonZeroU32;
+use std::ops::Index;
+
+use image::{DynamicImage, GenericImageView};
+use indexmap::IndexMap;
+use wgpu::{Device, Queue, SurfaceConfiguration, Surface, RenderPipeline, Color, RenderPass, BindGroup, BindGroupLayout, Sampler};
 use winit::dpi::PhysicalSize;
 use winit::window::Window;
 
@@ -9,6 +14,8 @@ pub struct Graphics {
     queue: Queue,
     surface: Surface,
     config: SurfaceConfiguration,
+
+    texture_manager: TextureManager,
 
     color_pipeline: RenderPipeline,
     texture_pipeline: RenderPipeline,
@@ -40,6 +47,9 @@ impl Graphics {
             present_mode: wgpu::PresentMode::Fifo,
         };
         surface.configure(&device, &config);
+
+        let mut texture_manager = TextureManager::new(&device);
+        texture_manager.make_texture(&device, &queue, image::load_from_memory(include_bytes!("error.png")).unwrap());
 
         let color_shader = device.create_shader_module(&wgpu::ShaderModuleDescriptor {
             label: Some("color_shader"),
@@ -94,7 +104,7 @@ impl Graphics {
 
         let texture_pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
             label: None,
-            bind_group_layouts: &[],
+            bind_group_layouts: &[&texture_manager.bind_group_layout],
             push_constant_ranges: &[],
         });
 
@@ -139,6 +149,8 @@ impl Graphics {
             surface,
             config,
 
+            texture_manager,
+
             color_pipeline,
             texture_pipeline,
         }
@@ -167,6 +179,7 @@ impl Graphics {
             });
 
             let frame = Frame {
+                texture_manager: &self.texture_manager,
                 render_pass,
                 color_pipeline: &self.color_pipeline,
                 texture_pipeline: &self.texture_pipeline,
@@ -188,8 +201,130 @@ impl Graphics {
 }
 
 pub struct Frame<'a> {
+    pub texture_manager: &'a TextureManager,
     pub(crate) render_pass: RenderPass<'a>,
     pub(crate) color_pipeline: &'a RenderPipeline,
     pub(crate) texture_pipeline: &'a RenderPipeline,
     pub(crate) queue: &'a Queue,
+}
+
+pub type TextureID = usize;
+
+pub struct TextureManager {
+    textures: IndexMap<TextureID, BindGroup>,
+    next_id: TextureID,
+    bind_group_layout: BindGroupLayout,
+    nearest_sampler: Sampler,
+}
+
+impl TextureManager {
+    fn new(device: &Device) -> Self {
+        let bind_group_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
+            label: None,
+            entries: &[
+                wgpu::BindGroupLayoutEntry {
+                    binding: 0,
+                    visibility: wgpu::ShaderStages::FRAGMENT,
+                    ty: wgpu::BindingType::Texture {
+                        sample_type: wgpu::TextureSampleType::Float { filterable: true },
+                        view_dimension: wgpu::TextureViewDimension::D2,
+                        multisampled: false,
+                    },
+                    count: None,
+                },
+                wgpu::BindGroupLayoutEntry {
+                    binding: 1,
+                    visibility: wgpu::ShaderStages::FRAGMENT,
+                    ty: wgpu::BindingType::Sampler(wgpu::SamplerBindingType::Filtering),
+                    count: None,
+                },
+            ],
+        });
+
+        let nearest_sampler = device.create_sampler(&wgpu::SamplerDescriptor {
+            label: None,
+            address_mode_u: wgpu::AddressMode::Repeat,
+            address_mode_v: wgpu::AddressMode::Repeat,
+            address_mode_w: wgpu::AddressMode::Repeat,
+            mag_filter: wgpu::FilterMode::Nearest,
+            min_filter: wgpu::FilterMode::Nearest,
+            mipmap_filter: wgpu::FilterMode::Nearest,
+            ..Default::default()
+        });
+
+        Self {
+            textures: IndexMap::new(),
+            next_id: 0,
+            bind_group_layout,
+            nearest_sampler,
+        }
+    }
+
+    pub fn make_texture(&mut self, device: &Device, queue: &Queue, image: DynamicImage) -> TextureID {
+        let (width, height) = image.dimensions();
+
+        let size = wgpu::Extent3d {
+            width,
+            height,
+            depth_or_array_layers: 1,
+        };
+
+        let texture = device.create_texture(&wgpu::TextureDescriptor {
+            label: None,
+            size,
+            mip_level_count: 1,
+            sample_count: 1,
+            dimension: wgpu::TextureDimension::D2,
+            format: wgpu::TextureFormat::Rgba8UnormSrgb,
+            usage: wgpu::TextureUsages::TEXTURE_BINDING | wgpu::TextureUsages::COPY_DST,
+        });
+
+        queue.write_texture(
+            wgpu::ImageCopyTexture {
+                texture: &texture,
+                mip_level: 0,
+                origin: wgpu::Origin3d::ZERO,
+                aspect: wgpu::TextureAspect::All,
+            },
+            image.as_rgba8().unwrap(),
+            wgpu::ImageDataLayout {
+                offset: 0,
+                bytes_per_row: NonZeroU32::new(4 * width),
+                rows_per_image: NonZeroU32::new(height),
+            },
+            size,
+        );
+
+        let bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
+            label: None,
+            layout: &self.bind_group_layout,
+            entries: &[
+                wgpu::BindGroupEntry {
+                    binding: 0,
+                    resource: wgpu::BindingResource::TextureView(&texture.create_view(&wgpu::TextureViewDescriptor::default())),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 1,
+                    resource: wgpu::BindingResource::Sampler(&self.nearest_sampler),
+                },
+            ],
+        });
+
+        self.textures.insert(self.next_id, bind_group);
+        self.next_id += 1;
+
+        self.next_id - 1
+    }
+}
+
+impl Index<TextureID> for TextureManager {
+    type Output = BindGroup;
+
+    fn index(&self, index: TextureID) -> &Self::Output {
+        if let Some(texture) = self.textures.get(&index) {
+            texture
+        } else {
+            todo!("Return error texture")
+        }
+    }
 }
