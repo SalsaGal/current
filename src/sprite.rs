@@ -138,6 +138,11 @@ impl Sprite {
         }
     }
 
+    pub fn new_path_rect(graphics: &mut Graphics, path: &str) -> Self {
+        let id = graphics.texture_manager.make_texture(&graphics.device, &graphics.queue, image::open(path).unwrap());
+        Self::new_texture_rect(graphics, id)
+    }
+
     pub fn new_texture_rect(graphics: &Graphics, id: TextureID) -> Self {
         let transform = Transform::default();
 

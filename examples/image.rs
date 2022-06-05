@@ -13,16 +13,13 @@ struct Image {
 
 impl Game for Image {
     fn init(data: &mut GameData) -> Self {
-        let image = image::load_from_memory(include_bytes!("test.png")).unwrap();
-        data.graphics.texture_manager.make_texture(&data.graphics.device, &data.graphics.queue, image);
-
         Self {
             rect: Sprite::new_texture_rect(data.graphics, 0).with_transform(Transform {
                 translation: (-0.5, 0.0, 0.0).into(),
                 scale: (0.5, 1.0).into(),
                 ..Default::default()
             }),
-            test: Sprite::new_texture_rect(data.graphics, 1).with_transform(Transform {
+            test: Sprite::new_path_rect(data.graphics, "examples/test.png").with_transform(Transform {
                 translation: (0.5, 0.0, 0.0).into(),
                 scale: (0.5, 1.0).into(),
                 ..Default::default()
