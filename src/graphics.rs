@@ -14,11 +14,11 @@ use crate::sprite::{ColorVertex, TextureVertex, Transform};
 
 pub struct Graphics {
     pub device: Device,
-    queue: Queue,
+    pub queue: Queue,
     surface: Surface,
     config: SurfaceConfiguration,
 
-    texture_manager: TextureManager,
+    pub texture_manager: TextureManager,
 
     color_pipeline: RenderPipeline,
     texture_pipeline: RenderPipeline,

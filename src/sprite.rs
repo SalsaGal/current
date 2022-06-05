@@ -147,19 +147,19 @@ impl Sprite {
                 contents: bytemuck::cast_slice(&[
                     TextureVertex {
                         position: [-1.0, -1.0, 0.0],
-                        tex_coords: [0.0, 0.0],
+                        tex_coords: [0.0, 1.0],
                     },
                     TextureVertex {
                         position: [1.0, -1.0, 0.0],
-                        tex_coords: [1.0, 0.0],
-                    },
-                    TextureVertex {
-                        position: [1.0, 1.0, 0.0],
                         tex_coords: [1.0, 1.0],
                     },
                     TextureVertex {
+                        position: [1.0, 1.0, 0.0],
+                        tex_coords: [1.0, 0.0],
+                    },
+                    TextureVertex {
                         position: [-1.0, 1.0, 0.0],
-                        tex_coords: [0.0, 1.0],
+                        tex_coords: [0.0, 0.0],
                     },
                 ]),
                 usage: wgpu::BufferUsages::VERTEX,
