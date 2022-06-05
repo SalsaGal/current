@@ -4,7 +4,7 @@ use glam::{Mat4, Quat, Vec2, Vec3};
 use wgpu::util::{BufferInitDescriptor, DeviceExt};
 use wgpu::{Buffer, Color, VertexAttribute, VertexBufferLayout};
 
-use crate::graphics::{Frame, Graphics};
+use crate::graphics::{Frame, Graphics, TextureID};
 
 #[repr(C)]
 #[derive(Clone, Copy, Debug, bytemuck::Pod, bytemuck::Zeroable)]
@@ -138,7 +138,7 @@ impl Sprite {
         }
     }
 
-    pub fn new_texture_rect(graphics: &Graphics) -> Self {
+    pub fn new_texture_rect(graphics: &Graphics, id: TextureID) -> Self {
         let transform = Transform::default();
 
         Self {
@@ -170,7 +170,7 @@ impl Sprite {
                 usage: wgpu::BufferUsages::INDEX,
             }),
             index_count: 6,
-            ty: SpriteType::Texture,
+            ty: SpriteType::Texture(id),
 
             transform_buffer: graphics.device.create_buffer_init(&BufferInitDescriptor {
                 label: None,
@@ -205,7 +205,7 @@ impl Sprite {
                     .set_index_buffer(self.index_buffer.slice(..), wgpu::IndexFormat::Uint16);
                 frame.render_pass.draw_indexed(0..self.index_count, 0, 0..1);
             }
-            SpriteType::Texture => {
+            SpriteType::Texture(id) => {
                 frame.render_pass.set_pipeline(frame.texture_pipeline);
                 frame
                     .render_pass
@@ -218,7 +218,7 @@ impl Sprite {
                     .set_index_buffer(self.index_buffer.slice(..), wgpu::IndexFormat::Uint16);
                 frame
                     .render_pass
-                    .set_bind_group(0, &frame.texture_manager[0], &[]);
+                    .set_bind_group(0, &frame.texture_manager[id], &[]);
                 frame.render_pass.draw_indexed(0..self.index_count, 0, 0..1);
             }
         }
@@ -238,7 +238,7 @@ impl Sprite {
 
 enum SpriteType {
     Color,
-    Texture,
+    Texture(TextureID),
 }
 
 #[derive(Clone, Copy, Debug)]
