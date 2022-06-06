@@ -255,6 +255,7 @@ pub type TextureID = usize;
 pub struct TextureManager {
     textures: IndexMap<TextureID, BindGroup>,
     next_id: TextureID,
+
     bind_group_layout: BindGroupLayout,
     linear_sampler: Sampler,
     nearest_sampler: Sampler,
@@ -313,6 +314,17 @@ impl TextureManager {
             linear_sampler,
             nearest_sampler,
         }
+    }
+
+    /// Deletes all values in the texture cache.
+    pub fn clear(&mut self) {
+        while self.textures.len() > 1 {
+            self.textures.pop();
+        }
+    }
+
+    pub fn get(&self, id: TextureID) -> Option<&BindGroup> {
+        self.textures.get(&id)
     }
 
     /// Create a texture from `image` and store it in the texture cache. Returns the
@@ -394,7 +406,7 @@ impl Index<TextureID> for TextureManager {
         if let Some(texture) = self.textures.get(&index) {
             texture
         } else {
-            todo!("Return error texture")
+            &self.textures[0]
         }
     }
 }
