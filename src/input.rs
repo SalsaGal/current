@@ -1,10 +1,13 @@
 use std::collections::HashMap;
 
+use glam::Vec2;
+use winit::dpi::PhysicalPosition;
 use winit::event::{KeyboardInput, MouseButton, ScanCode, ElementState};
 
 pub struct Input {
     keys: HashMap<ScanCode, InputState>,
     buttons: HashMap<MouseButton, InputState>,
+    mouse_pos: Vec2,
 }
 
 impl Input {
@@ -12,6 +15,7 @@ impl Input {
         Self {
             keys: HashMap::new(),
             buttons: HashMap::new(),
+            mouse_pos: Vec2::ZERO,
         }
     }
 
@@ -31,6 +35,10 @@ impl Input {
             InputState::Up => actual == state || actual == InputState::Released,
             _ => actual == state,
         }
+    }
+
+    pub fn get_cursor_pos(&self) -> Vec2 {
+        self.mouse_pos
     }
 
     pub(crate) fn update(&mut self) {
@@ -73,6 +81,10 @@ impl Input {
                 self.buttons.insert(button, InputState::Released);
             }
         }
+    }
+
+    pub(crate) fn handle_cursor(&mut self, pos: PhysicalPosition<f64>) {
+        self.mouse_pos = Vec2::new(pos.x as f32, pos.y as f32);
     }
 }
 
