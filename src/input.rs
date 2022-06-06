@@ -7,7 +7,9 @@ use winit::event::{KeyboardInput, MouseButton, ScanCode, ElementState};
 pub struct Input {
     keys: HashMap<ScanCode, InputState>,
     buttons: HashMap<MouseButton, InputState>,
-    mouse_pos: Vec2,
+    pub mouse_pos: Vec2,
+    /// Amount of motion this update
+    pub mouse_mov: Vec2,
 }
 
 impl Input {
@@ -16,6 +18,7 @@ impl Input {
             keys: HashMap::new(),
             buttons: HashMap::new(),
             mouse_pos: Vec2::ZERO,
+            mouse_mov: Vec2::ZERO,
         }
     }
 
@@ -37,10 +40,6 @@ impl Input {
         }
     }
 
-    pub fn get_cursor_pos(&self) -> Vec2 {
-        self.mouse_pos
-    }
-
     pub(crate) fn update(&mut self) {
         self.keys.iter_mut().for_each(|(_, state)| match state {
             InputState::Pressed => *state = InputState::Down,
@@ -55,6 +54,8 @@ impl Input {
             _ => {}
         });
         self.buttons.retain(|_, state| *state != InputState::Released);
+
+        self.mouse_mov = Vec2::ZERO;
     }
 
     pub(crate) fn handle_key(&mut self, input: KeyboardInput) {
@@ -84,7 +85,9 @@ impl Input {
     }
 
     pub(crate) fn handle_cursor(&mut self, pos: PhysicalPosition<f64>) {
+        let old_pos = self.mouse_pos;
         self.mouse_pos = Vec2::new(pos.x as f32, pos.y as f32);
+        self.mouse_mov = self.mouse_pos - old_pos;
     }
 }
 
