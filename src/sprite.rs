@@ -269,12 +269,6 @@ impl Transform {
         self
     }
 
-    pub fn with_translation_centered(mut self, translation: Vec3) -> Self {
-        let offset = self.scale / 2.0;
-        self.translation = translation - offset.extend(0.0);
-        self
-    }
-
     fn matrix(&self) -> [[f32; 4]; 4] {
         Mat4::from_scale_rotation_translation(
             self.scale.extend(1.0),
