@@ -46,24 +46,29 @@ impl Game for Crawl {
     }
 
     fn update(&mut self, data: &mut GameData) {
+        let mut modified = false;
         if data.input.is_key(17, InputState::Pressed) {
             self.player_pos.y += 1;
             self.player_direction = Direction::Up;
-            self.player_sprite.set_transform(player_transform(self.player_pos, self.player_direction));
+            modified = true;
         }
         if data.input.is_key(31, InputState::Pressed) {
             self.player_pos.y -= 1;
             self.player_direction = Direction::Down;
-            self.player_sprite.set_transform(player_transform(self.player_pos, self.player_direction));
+            modified = true;
         }
         if data.input.is_key(32, InputState::Pressed) {
             self.player_pos.x += 1;
             self.player_direction = Direction::Right;
-            self.player_sprite.set_transform(player_transform(self.player_pos, self.player_direction));
+            modified = true;
         }
         if data.input.is_key(30, InputState::Pressed) {
             self.player_pos.x -= 1;
             self.player_direction = Direction::Left;
+            modified = true;
+        }
+
+        if modified {
             self.player_sprite.set_transform(player_transform(self.player_pos, self.player_direction));
         }
     }
