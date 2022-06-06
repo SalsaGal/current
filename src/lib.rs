@@ -4,16 +4,27 @@ pub mod sprite;
 
 use std::time::{Duration, Instant};
 
+use glam::UVec2;
 use graphics::{Frame, Graphics};
+use winit::dpi::PhysicalSize;
 use winit::event::{Event, WindowEvent};
 use winit::event_loop::{ControlFlow, EventLoop};
 use winit::window::WindowBuilder;
 
 use crate::input::Input;
 
-#[derive(Default)]
 pub struct GameInit {
     pub window_title: &'static str,
+    pub window_size: UVec2,
+}
+
+impl Default for GameInit {
+    fn default() -> Self {
+        Self {
+            window_title: "Current window",
+            window_size: UVec2::new(640, 480),
+        }
+    }
 }
 
 pub struct GameData<'a> {
@@ -43,6 +54,7 @@ where
         let event_loop = EventLoop::new();
         let window = WindowBuilder::new()
             .with_title(init.window_title)
+            .with_inner_size(PhysicalSize::new(init.window_size.x, init.window_size.y))
             .build(&event_loop)
             .unwrap();
 

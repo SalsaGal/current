@@ -3,6 +3,7 @@ use current::*;
 fn main() {
     Window::run(GameInit {
         window_title: "Window Title",
+        ..Default::default()
     });
 }
 

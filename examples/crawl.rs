@@ -9,6 +9,7 @@ use glam::{UVec2, Vec2};
 fn main() {
     Crawl::run(current::GameInit {
         window_title: "Crawler",
+        ..Default::default()
     });
 }
 
