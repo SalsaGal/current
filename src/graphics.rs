@@ -13,6 +13,7 @@ use winit::window::Window;
 
 use crate::sprite::{ColorVertex, TextureVertex, Transform};
 
+/// The core component that handles all general purpose graphics.
 pub struct Graphics {
     pub device: Device,
     pub queue: Queue,
@@ -220,6 +221,7 @@ impl Graphics {
         self.surface.configure(&self.device, &self.config);
     }
 
+    /// Get the size of the window's renderable surface
     pub fn get_screen_size(&self) -> Vec2 {
         glam::UVec2::new(self.config.width, self.config.height).as_vec2()
     }
@@ -228,11 +230,15 @@ impl Graphics {
         size / self.get_screen_size()
     }
 
+    /// Convert the position of a pixel into a position that would be
+    /// useful to rendering space (which spans from -1.0 to 1.0, regardless
+    /// of screen size).
     pub fn pixel_to_screen_pos(&self, pos: Vec2) -> Vec2 {
         pos / self.get_screen_size() * 2.0 - 1.0
     }
 }
 
+/// A handle for structures that are needed during rendering itself.
 pub struct Frame<'a> {
     pub texture_manager: &'a TextureManager,
     pub(crate) render_pass: RenderPass<'a>,
@@ -241,8 +247,10 @@ pub struct Frame<'a> {
     pub(crate) queue: &'a Queue,
 }
 
+/// An identifier used to locate textures within a `TextureManager`'s list of textures.
 pub type TextureID = usize;
 
+/// Contains all textures and a collection of everything required for them
 pub struct TextureManager {
     textures: IndexMap<TextureID, BindGroup>,
     next_id: TextureID,
@@ -293,6 +301,8 @@ impl TextureManager {
         }
     }
 
+    /// Create a texture from `image` and store it in the texture cache. Returns the
+    /// newly loaded texture's ID.
     pub fn make_texture(
         &mut self,
         device: &Device,
@@ -360,6 +370,8 @@ impl TextureManager {
 impl Index<TextureID> for TextureManager {
     type Output = BindGroup;
 
+    /// Get the texture at `index` from the texture cache. If it is missing return the
+    /// error texture that is baked into the program.
     fn index(&self, index: TextureID) -> &Self::Output {
         if let Some(texture) = self.textures.get(&index) {
             texture
