@@ -11,7 +11,7 @@ use wgpu::{
 use winit::dpi::PhysicalSize;
 use winit::window::Window;
 
-use crate::sprite::{ColorVertex, TextureVertex, Transform};
+use crate::sprite::{ColorVertex, TextureVertex, Transform, Filter};
 
 /// The core component that handles all general purpose graphics.
 pub struct Graphics {
@@ -67,6 +67,7 @@ impl Graphics {
             &device,
             &queue,
             image::load_from_memory(include_bytes!("error.png")).unwrap(),
+            Filter::Nearest,
         );
 
         let color_shader = device.create_shader_module(&wgpu::ShaderModuleDescriptor {
@@ -255,6 +256,7 @@ pub struct TextureManager {
     textures: IndexMap<TextureID, BindGroup>,
     next_id: TextureID,
     bind_group_layout: BindGroupLayout,
+    linear_sampler: Sampler,
     nearest_sampler: Sampler,
 }
 
@@ -282,6 +284,17 @@ impl TextureManager {
             ],
         });
 
+        let linear_sampler = device.create_sampler(&wgpu::SamplerDescriptor {
+            label: None,
+            address_mode_u: wgpu::AddressMode::Repeat,
+            address_mode_v: wgpu::AddressMode::Repeat,
+            address_mode_w: wgpu::AddressMode::Repeat,
+            mag_filter: wgpu::FilterMode::Linear,
+            min_filter: wgpu::FilterMode::Nearest,
+            mipmap_filter: wgpu::FilterMode::Nearest,
+            ..Default::default()
+        });
+
         let nearest_sampler = device.create_sampler(&wgpu::SamplerDescriptor {
             label: None,
             address_mode_u: wgpu::AddressMode::Repeat,
@@ -297,6 +310,7 @@ impl TextureManager {
             textures: IndexMap::new(),
             next_id: 0,
             bind_group_layout,
+            linear_sampler,
             nearest_sampler,
         }
     }
@@ -308,6 +322,7 @@ impl TextureManager {
         device: &Device,
         queue: &Queue,
         image: DynamicImage,
+        filter: Filter,
     ) -> TextureID {
         let (width, height) = image.dimensions();
 
@@ -355,7 +370,10 @@ impl TextureManager {
                 },
                 wgpu::BindGroupEntry {
                     binding: 1,
-                    resource: wgpu::BindingResource::Sampler(&self.nearest_sampler),
+                    resource: wgpu::BindingResource::Sampler(match filter {
+                        Filter::Linear => &self.linear_sampler,
+                        Filter::Nearest => &self.nearest_sampler,
+                    }),
                 },
             ],
         });

@@ -138,11 +138,12 @@ impl Sprite {
         }
     }
 
-    pub fn new_path_rect(graphics: &mut Graphics, path: &str) -> Self {
+    pub fn new_path_rect(graphics: &mut Graphics, path: &str, filter: Filter) -> Self {
         let id = graphics.texture_manager.make_texture(
             &graphics.device,
             &graphics.queue,
             image::open(path).unwrap(),
+            filter,
         );
         Self::new_texture_rect(graphics, id)
     }
@@ -336,4 +337,9 @@ impl Default for Transform {
             scale: Vec2::ONE,
         }
     }
+}
+
+pub enum Filter {
+    Linear,
+    Nearest,
 }

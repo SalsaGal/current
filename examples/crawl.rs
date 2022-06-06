@@ -2,7 +2,7 @@ use std::f32::consts::TAU;
 
 use current::graphics::{Frame, Graphics};
 use current::input::InputState;
-use current::sprite::{Sprite, Transform};
+use current::sprite::{Sprite, Transform, Filter};
 use current::{Game, GameData, GameExt};
 use glam::{UVec2, Vec2};
 
@@ -43,7 +43,7 @@ impl Game for Crawl {
         Self {
             player_pos: (0, 0).into(),
             player_direction: Direction::Up,
-            player_sprite: Sprite::new_path_rect(data.graphics, "examples/test.png")
+            player_sprite: Sprite::new_path_rect(data.graphics, "examples/test.png", Filter::Linear)
                 .with_transform(player_transform(
                     data.graphics,
                     (0, 0).into(),

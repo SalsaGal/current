@@ -1,5 +1,5 @@
 use current::graphics::Frame;
-use current::sprite::{Sprite, Transform};
+use current::sprite::{Sprite, Transform, Filter};
 use current::*;
 
 fn main() {
@@ -19,7 +19,7 @@ impl Game for Image {
                 scale: (0.5, 1.0).into(),
                 ..Default::default()
             }),
-            test: Sprite::new_path_rect(data.graphics, "examples/test.png").with_transform(
+            test: Sprite::new_path_rect(data.graphics, "examples/test.png", Filter::Linear).with_transform(
                 Transform {
                     translation: (0.5, 0.0, 0.0).into(),
                     scale: (0.5, 1.0).into(),
