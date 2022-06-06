@@ -139,7 +139,11 @@ impl Sprite {
     }
 
     pub fn new_path_rect(graphics: &mut Graphics, path: &str) -> Self {
-        let id = graphics.texture_manager.make_texture(&graphics.device, &graphics.queue, image::open(path).unwrap());
+        let id = graphics.texture_manager.make_texture(
+            &graphics.device,
+            &graphics.queue,
+            image::open(path).unwrap(),
+        );
         Self::new_texture_rect(graphics, id)
     }
 
@@ -278,11 +282,7 @@ macro_rules! transform_methods {
 }
 
 impl Transform {
-    transform_methods!(
-        translation: Vec3,
-        rotation: Quat,
-        scale: Vec2
-    );
+    transform_methods!(translation: Vec3, rotation: Quat, scale: Vec2);
 
     pub fn with_straight_rotation(mut self, angle: f32) -> Self {
         self.rotation = Quat::from_euler(glam::EulerRot::XYZ, 0.0, 0.0, angle);

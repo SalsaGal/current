@@ -1,6 +1,7 @@
 use std::num::NonZeroU32;
 use std::ops::Index;
 
+use glam::Vec2;
 use image::{DynamicImage, GenericImageView};
 use indexmap::IndexMap;
 use wgpu::{
@@ -217,6 +218,18 @@ impl Graphics {
         self.config.width = size.width;
         self.config.height = size.height;
         self.surface.configure(&self.device, &self.config);
+    }
+
+    pub fn get_screen_size(&self) -> Vec2 {
+        glam::UVec2::new(self.config.width, self.config.height).as_vec2()
+    }
+
+    pub fn pixel_to_screen_size(&self, size: Vec2) -> Vec2 {
+        size / self.get_screen_size()
+    }
+
+    pub fn pixel_to_screen_pos(&self, pos: Vec2) -> Vec2 {
+        pos / self.get_screen_size() * 2.0 - 1.0
     }
 }
 

@@ -1,13 +1,15 @@
 use std::f32::consts::TAU;
 
-use current::graphics::Frame;
+use current::graphics::{Frame, Graphics};
 use current::input::InputState;
 use current::sprite::{Sprite, Transform};
 use current::{Game, GameData, GameExt};
-use glam::{UVec2, Vec3};
+use glam::{UVec2, Vec2};
 
 fn main() {
-    Crawl::run(current::GameInit { window_title: "Crawler" });
+    Crawl::run(current::GameInit {
+        window_title: "Crawler",
+    });
 }
 
 struct Crawl {
@@ -21,7 +23,7 @@ enum Direction {
     Up,
     Down,
     Left,
-    Right
+    Right,
 }
 
 impl From<Direction> for f32 {
@@ -41,7 +43,11 @@ impl Game for Crawl {
             player_pos: (0, 0).into(),
             player_direction: Direction::Up,
             player_sprite: Sprite::new_path_rect(data.graphics, "examples/test.png")
-                .with_transform(player_transform((0, 0).into(), Direction::Up)),
+                .with_transform(player_transform(
+                    data.graphics,
+                    (0, 0).into(),
+                    Direction::Up,
+                )),
         }
     }
 
@@ -69,7 +75,11 @@ impl Game for Crawl {
         }
 
         if modified {
-            self.player_sprite.set_transform(player_transform(self.player_pos, self.player_direction));
+            self.player_sprite.set_transform(player_transform(
+                data.graphics,
+                self.player_pos,
+                self.player_direction,
+            ));
         }
     }
 
@@ -78,11 +88,13 @@ impl Game for Crawl {
     }
 }
 
-fn player_transform(pos: UVec2, direction: Direction) -> Transform {
-    let origin = Vec3::new(-1.0 + 0.125, -1.0 + 0.125, 0.0);
+fn player_transform(graphics: &Graphics, pos: UVec2, direction: Direction) -> Transform {
     Transform {
-        translation: origin + (pos.extend(0).as_vec3() * 0.25),
-        scale: (0.125, 0.125).into(),
+        translation: graphics
+            .pixel_to_screen_pos(pos.as_vec2() * Vec2::new(32.0, 32.0))
+            .extend(0.0),
+        scale: graphics.pixel_to_screen_size(Vec2::new(32.0, 32.0)),
         ..Default::default()
-    }.with_straight_rotation(direction.into())
+    }
+    .with_straight_rotation(direction.into())
 }

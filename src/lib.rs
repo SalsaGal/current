@@ -13,7 +13,7 @@ use crate::input::Input;
 
 #[derive(Default)]
 pub struct GameInit {
-    pub window_title: &'static str
+    pub window_title: &'static str,
 }
 
 pub struct GameData<'a> {
