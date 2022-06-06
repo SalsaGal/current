@@ -86,7 +86,8 @@ where
             }
             Event::WindowEvent { event, .. } => match event {
                 WindowEvent::CloseRequested => *control_flow = ControlFlow::Exit,
-                WindowEvent::KeyboardInput { input: event, .. } => input.handle(event),
+                WindowEvent::KeyboardInput { input: event, .. } => input.handle_key(event),
+                WindowEvent::MouseInput { button, state, .. } => input.handle_button(button, state),
                 WindowEvent::Resized(size) => graphics.resize(size),
                 WindowEvent::ScaleFactorChanged { new_inner_size, .. } => {
                     graphics.resize(*new_inner_size)
