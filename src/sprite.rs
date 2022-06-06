@@ -74,6 +74,60 @@ pub struct Sprite {
 }
 
 impl Sprite {
+    pub fn new_color_mesh(graphics: &Graphics, vertices: &[ColorVertex], indices: &[u16]) -> Self {
+        let transform = Transform::default();
+
+        Self {
+            vertex_buffer: graphics.device.create_buffer_init(&BufferInitDescriptor {
+                label: None,
+                contents: bytemuck::cast_slice(vertices),
+                usage: wgpu::BufferUsages::VERTEX,
+            }),
+            index_buffer: graphics.device.create_buffer_init(&BufferInitDescriptor {
+                label: None,
+                contents: bytemuck::cast_slice(indices),
+                usage: wgpu::BufferUsages::INDEX,
+            }),
+            index_count: indices.len() as u32,
+            ty: SpriteType::Color,
+
+            transform_buffer: graphics.device.create_buffer_init(&BufferInitDescriptor {
+                label: None,
+                contents: bytemuck::cast_slice(&[transform.matrix()]),
+                usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
+            }),
+            transform,
+            transform_outdated: false,
+        }
+    }
+
+    pub fn new_texture_mesh(graphics: &Graphics, vertices: &[TextureVertex], indices: &[u16]) -> Self {
+        let transform = Transform::default();
+
+        Self {
+            vertex_buffer: graphics.device.create_buffer_init(&BufferInitDescriptor {
+                label: None,
+                contents: bytemuck::cast_slice(vertices),
+                usage: wgpu::BufferUsages::VERTEX,
+            }),
+            index_buffer: graphics.device.create_buffer_init(&BufferInitDescriptor {
+                label: None,
+                contents: bytemuck::cast_slice(indices),
+                usage: wgpu::BufferUsages::INDEX,
+            }),
+            index_count: indices.len() as u32,
+            ty: SpriteType::Color,
+
+            transform_buffer: graphics.device.create_buffer_init(&BufferInitDescriptor {
+                label: None,
+                contents: bytemuck::cast_slice(&[transform.matrix()]),
+                usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
+            }),
+            transform,
+            transform_outdated: false,
+        }
+    }
+
     pub fn new_color_rect(graphics: &Graphics, color: Color) -> Self {
         let transform = Transform::default();
 
