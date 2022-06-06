@@ -269,6 +269,11 @@ impl Transform {
         self
     }
 
+    pub fn with_straight_rotation(mut self, angle: f32) -> Self {
+        self.rotation = Quat::from_euler(glam::EulerRot::XYZ, 0.0, 0.0, angle);
+        self
+    }
+
     fn matrix(&self) -> [[f32; 4]; 4] {
         Mat4::from_scale_rotation_translation(
             self.scale.extend(1.0),
