@@ -13,6 +13,7 @@ use winit::window::WindowBuilder;
 
 use crate::input::Input;
 
+/// Variables used to initialise the game.
 pub struct GameInit {
     pub window_title: &'static str,
     pub window_size: UVec2,
@@ -27,14 +28,21 @@ impl Default for GameInit {
     }
 }
 
+/// A struct containing references to all core components of the library.
 pub struct GameData<'a> {
     pub graphics: &'a mut Graphics,
     pub input: &'a Input,
+    /// The time since the last update.
     pub delta_time: Duration,
 }
 
 pub trait Game: GameExt {
+    /// Called once `GameExt::run()` is called. Used to create the game's struct
+    /// while allowing access to the `GameData`.
     fn init(_: &mut GameData) -> Self;
+    /// Called every frame. Has access to less parts of the library than Game::update
+    /// however this has access to a `Frame` which contains things specific
+    /// to rendering.
     fn render<'a>(&'a mut self, _: Frame<'a>) {}
     fn update(&mut self, _: &mut GameData) {}
 }
@@ -50,6 +58,7 @@ impl<T: 'static> GameExt for T
 where
     T: Game,
 {
+    /// Used to start the game.
     fn run(init: GameInit) -> ! {
         let event_loop = EventLoop::new();
         let window = WindowBuilder::new()
