@@ -27,6 +27,18 @@ impl Game for Crawl {
             self.player_pos.y += 1;
             self.player_sprite.set_transform(player_transform(self.player_pos));
         }
+        if data.input.is_key(31, InputState::Pressed) {
+            self.player_pos.y -= 1;
+            self.player_sprite.set_transform(player_transform(self.player_pos));
+        }
+        if data.input.is_key(32, InputState::Pressed) {
+            self.player_pos.x += 1;
+            self.player_sprite.set_transform(player_transform(self.player_pos));
+        }
+        if data.input.is_key(30, InputState::Pressed) {
+            self.player_pos.x -= 1;
+            self.player_sprite.set_transform(player_transform(self.player_pos));
+        }
     }
 
     fn render<'a>(&'a mut self, mut frame: Frame<'a>) {
