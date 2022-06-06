@@ -62,7 +62,7 @@ impl Graphics {
         };
         surface.configure(&device, &config);
 
-        let mut texture_manager = TextureManager::new(&device);
+        let mut texture_manager = TextureManager::new(&device, &queue);
         texture_manager.make_texture(
             &device,
             &queue,
@@ -254,6 +254,7 @@ pub type TextureID = usize;
 /// Contains all textures and a collection of everything required for them
 pub struct TextureManager {
     textures: IndexMap<TextureID, BindGroup>,
+    error_texture: BindGroup,
     next_id: TextureID,
 
     bind_group_layout: BindGroupLayout,
@@ -262,7 +263,7 @@ pub struct TextureManager {
 }
 
 impl TextureManager {
-    fn new(device: &Device) -> Self {
+    fn new(device: &Device, queue: &Queue) -> Self {
         let bind_group_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
             label: None,
             entries: &[
@@ -309,18 +310,70 @@ impl TextureManager {
 
         Self {
             textures: IndexMap::new(),
+            error_texture: Self::make_error_texture(device, queue, &nearest_sampler, &bind_group_layout),
             next_id: 0,
+
             bind_group_layout,
             linear_sampler,
             nearest_sampler,
         }
     }
 
+    fn make_error_texture(device: &Device, queue: &Queue, sampler: &Sampler, bind_group_layout: &BindGroupLayout) -> BindGroup {
+        let size = wgpu::Extent3d {
+            width: 2,
+            height: 2,
+            depth_or_array_layers: 1,
+        };
+
+        let texture = device.create_texture(&wgpu::TextureDescriptor {
+            label: None,
+            size,
+            mip_level_count: 1,
+            sample_count: 1,
+            dimension: wgpu::TextureDimension::D2,
+            format: wgpu::TextureFormat::Rgba8UnormSrgb,
+            usage: wgpu::TextureUsages::TEXTURE_BINDING | wgpu::TextureUsages::COPY_DST,
+        });
+
+        queue.write_texture(
+            wgpu::ImageCopyTexture {
+                texture: &texture,
+                mip_level: 0,
+                origin: wgpu::Origin3d::ZERO,
+                aspect: wgpu::TextureAspect::All,
+            },
+            image::load_from_memory(include_bytes!("error.png")).unwrap().as_rgba8().unwrap(),
+            wgpu::ImageDataLayout {
+                offset: 0,
+                bytes_per_row: NonZeroU32::new(4 * 2),
+                rows_per_image: NonZeroU32::new(2),
+            },
+            size,
+        );
+
+        device.create_bind_group(&wgpu::BindGroupDescriptor {
+            label: None,
+            layout: bind_group_layout,
+            entries: &[
+                wgpu::BindGroupEntry {
+                    binding: 0,
+                    resource: wgpu::BindingResource::TextureView(
+                        &texture.create_view(&wgpu::TextureViewDescriptor::default()),
+                    ),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 1,
+                    resource: wgpu::BindingResource::Sampler(sampler),
+                },
+            ],
+        })
+    }
+
     /// Deletes all values in the texture cache.
     pub fn clear(&mut self) {
-        while self.textures.len() > 1 {
-            self.textures.pop();
-        }
+        self.textures.clear();
+        self.next_id = 0;
     }
 
     pub fn get(&self, id: TextureID) -> Option<&BindGroup> {
@@ -406,7 +459,7 @@ impl Index<TextureID> for TextureManager {
         if let Some(texture) = self.textures.get(&index) {
             texture
         } else {
-            &self.textures[0]
+            &self.error_texture
         }
     }
 }
