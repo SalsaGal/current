@@ -253,21 +253,36 @@ pub struct Transform {
     pub scale: Vec2,
 }
 
+macro_rules! transform_methods {
+    ($($i: ident: $t: ty),*) => {
+        $(
+            paste::paste! {
+                pub fn [<set_ $i>](&mut self, $i: $t) {
+                    self.$i = $i;
+                }
+
+                pub fn [<with_ $i>](mut self, $i: $t) -> Self {
+                    self.$i = $i;
+                    self
+                }
+
+                pub fn $i($i: $t) -> Self {
+                    Self {
+                        $i,
+                        ..Default::default()
+                    }
+                }
+            }
+        )*
+    };
+}
+
 impl Transform {
-    pub fn with_translation(mut self, translation: Vec3) -> Self {
-        self.translation = translation;
-        self
-    }
-
-    pub fn with_rotation(mut self, rotation: Quat) -> Self {
-        self.rotation = rotation;
-        self
-    }
-
-    pub fn with_scale(mut self, scale: Vec2) -> Self {
-        self.scale = scale;
-        self
-    }
+    transform_methods!(
+        translation: Vec3,
+        rotation: Quat,
+        scale: Vec2
+    );
 
     pub fn with_straight_rotation(mut self, angle: f32) -> Self {
         self.rotation = Quat::from_euler(glam::EulerRot::XYZ, 0.0, 0.0, angle);
