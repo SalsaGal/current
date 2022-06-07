@@ -24,6 +24,7 @@ pub struct Graphics {
 
     color_pipeline: RenderPipeline,
     texture_pipeline: RenderPipeline,
+    pub background_color: Color,
 }
 
 impl Graphics {
@@ -174,6 +175,7 @@ impl Graphics {
 
             color_pipeline,
             texture_pipeline,
+            background_color: Color::BLACK,
         }
     }
 
@@ -194,7 +196,7 @@ impl Graphics {
                     view: &view,
                     resolve_target: None,
                     ops: wgpu::Operations {
-                        load: wgpu::LoadOp::Clear(Color::BLACK),
+                        load: wgpu::LoadOp::Clear(self.background_color),
                         store: true,
                     },
                 }],

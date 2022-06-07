@@ -1,2 +1,2 @@
 [default]
-cargo run --example image
+cargo run --example crawl

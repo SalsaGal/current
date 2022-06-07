@@ -5,6 +5,7 @@ use current::input::InputState;
 use current::sprite::{Sprite, Transform, Filter};
 use current::{Game, GameData, GameExt};
 use glam::{UVec2, Vec2};
+use wgpu::Color;
 
 fn main() {
     Crawl::run(current::GameInit {
@@ -40,6 +41,7 @@ impl From<Direction> for f32 {
 
 impl Game for Crawl {
     fn init(data: &mut GameData) -> Self {
+        data.graphics.background_color = Color::BLUE;
         Self {
             player_pos: (0, 0).into(),
             player_direction: Direction::Up,
