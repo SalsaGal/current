@@ -9,7 +9,7 @@ use graphics::{Frame, Graphics};
 use winit::dpi::PhysicalSize;
 use winit::event::{Event, WindowEvent};
 use winit::event_loop::{ControlFlow, EventLoop};
-use winit::window::WindowBuilder;
+use winit::window::{WindowBuilder, Window};
 
 use crate::input::Input;
 
@@ -36,6 +36,15 @@ pub struct GameData<'a> {
     pub input: &'a Input,
     /// The time since the last update.
     pub delta_time: Duration,
+    pub window: &'a mut Window,
+}
+
+impl GameData<'_> {
+    pub fn resize_window(&mut self, size: UVec2) {
+        let size = PhysicalSize::new(size.x, size.y);
+        self.window.set_inner_size(size);
+        self.graphics.resize(size);
+    }
 }
 
 pub trait Game: GameExt {
@@ -67,7 +76,7 @@ where
     /// Used to start the game.
     fn run(init: GameInit) -> ! {
         let event_loop = EventLoop::new();
-        let window = WindowBuilder::new()
+        let mut window = WindowBuilder::new()
             .with_title(init.window_title)
             .with_inner_size(PhysicalSize::new(init.window_size.x, init.window_size.y))
             .with_resizable(init.window_resizable)
@@ -81,6 +90,7 @@ where
             graphics: &mut graphics,
             input: &input,
             delta_time: Duration::from_secs(0),
+            window: &mut window,
         };
         let mut game = Self::init(&mut game_data);
 
@@ -90,6 +100,7 @@ where
                 graphics: &mut graphics,
                 input: &input,
                 delta_time: Instant::now() - last_update,
+                window: &mut window,
             };
 
             game.handle_event(&mut game_data, &event);
