@@ -15,13 +15,15 @@ use crate::input::Input;
 
 /// Variables used to initialise the game.
 pub struct GameInit {
-    pub window_title: &'static str,
+    pub window_resizable: bool,
     pub window_size: UVec2,
+    pub window_title: &'static str,
 }
 
 impl Default for GameInit {
     fn default() -> Self {
         Self {
+            window_resizable: true,
             window_title: "Current window",
             window_size: UVec2::new(640, 480),
         }
@@ -64,6 +66,7 @@ where
         let window = WindowBuilder::new()
             .with_title(init.window_title)
             .with_inner_size(PhysicalSize::new(init.window_size.x, init.window_size.y))
+            .with_resizable(init.window_resizable)
             .build(&event_loop)
             .unwrap();
 
