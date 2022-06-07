@@ -46,7 +46,11 @@ pub trait Game: GameExt {
     /// however this has access to a `Frame` which contains things specific
     /// to rendering.
     fn render<'a>(&'a mut self, _: Frame<'a>) {}
+    /// Called repeatedly. Put your gameplay logic in here.
     fn update(&mut self, _: &mut GameData) {}
+    /// Handle input events from winit directly before the engine handles them. Useful
+    /// for more specific uses of hardware or features that Current doesn't support.
+    fn handle_event(&mut self, _: &mut GameData, _: &Event<()>) {}
 }
 
 pub trait GameExt
@@ -81,33 +85,37 @@ where
         let mut game = Self::init(&mut game_data);
 
         let mut last_update = Instant::now();
-        event_loop.run(move |event, _, control_flow| match event {
-            Event::MainEventsCleared => {
-                let mut game_data = GameData {
-                    graphics: &mut graphics,
-                    input: &input,
-                    delta_time: Instant::now() - last_update,
-                };
-                game.update(&mut game_data);
-                input.update();
-                window.request_redraw();
-                last_update = Instant::now();
-            }
-            Event::RedrawRequested(..) => {
-                graphics.render(|pass| game.render(pass));
-            }
-            Event::WindowEvent { event, .. } => match event {
-                WindowEvent::CloseRequested => *control_flow = ControlFlow::Exit,
-                WindowEvent::CursorMoved { position, .. } => input.handle_cursor(position),
-                WindowEvent::KeyboardInput { input: event, .. } => input.handle_key(event),
-                WindowEvent::MouseInput { button, state, .. } => input.handle_button(button, state),
-                WindowEvent::Resized(size) => graphics.resize(size),
-                WindowEvent::ScaleFactorChanged { new_inner_size, .. } => {
-                    graphics.resize(*new_inner_size)
+        event_loop.run(move |event, _, control_flow| {
+            let mut game_data = GameData {
+                graphics: &mut graphics,
+                input: &input,
+                delta_time: Instant::now() - last_update,
+            };
+
+            game.handle_event(&mut game_data, &event);
+            match event {
+                Event::MainEventsCleared => {
+                    game.update(&mut game_data);
+                    input.update();
+                    window.request_redraw();
+                    last_update = Instant::now();
                 }
+                Event::RedrawRequested(..) => {
+                    graphics.render(|pass| game.render(pass));
+                }
+                Event::WindowEvent { event, .. } => match event {
+                    WindowEvent::CloseRequested => *control_flow = ControlFlow::Exit,
+                    WindowEvent::CursorMoved { position, .. } => input.handle_cursor(position),
+                    WindowEvent::KeyboardInput { input: event, .. } => input.handle_key(event),
+                    WindowEvent::MouseInput { button, state, .. } => input.handle_button(button, state),
+                    WindowEvent::Resized(size) => graphics.resize(size),
+                    WindowEvent::ScaleFactorChanged { new_inner_size, .. } => {
+                        graphics.resize(*new_inner_size)
+                    }
+                    _ => {}
+                },
                 _ => {}
-            },
-            _ => {}
+            }
         })
     }
 }
