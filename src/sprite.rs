@@ -101,7 +101,11 @@ impl Sprite {
         }
     }
 
-    pub fn new_texture_mesh(graphics: &Graphics, vertices: &[TextureVertex], indices: &[u16]) -> Self {
+    pub fn new_texture_mesh(
+        graphics: &Graphics,
+        vertices: &[TextureVertex],
+        indices: &[u16],
+    ) -> Self {
         let transform = Transform::default();
 
         Self {

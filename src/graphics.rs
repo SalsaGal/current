@@ -11,7 +11,7 @@ use wgpu::{
 use winit::dpi::PhysicalSize;
 use winit::window::Window;
 
-use crate::sprite::{ColorVertex, TextureVertex, Transform, Filter};
+use crate::sprite::{ColorVertex, Filter, TextureVertex, Transform};
 
 /// The core component that handles all general purpose graphics.
 pub struct Graphics {
@@ -312,7 +312,12 @@ impl TextureManager {
 
         Self {
             textures: IndexMap::new(),
-            error_texture: Self::make_error_texture(device, queue, &nearest_sampler, &bind_group_layout),
+            error_texture: Self::make_error_texture(
+                device,
+                queue,
+                &nearest_sampler,
+                &bind_group_layout,
+            ),
             next_id: 0,
 
             bind_group_layout,
@@ -321,7 +326,12 @@ impl TextureManager {
         }
     }
 
-    fn make_error_texture(device: &Device, queue: &Queue, sampler: &Sampler, bind_group_layout: &BindGroupLayout) -> BindGroup {
+    fn make_error_texture(
+        device: &Device,
+        queue: &Queue,
+        sampler: &Sampler,
+        bind_group_layout: &BindGroupLayout,
+    ) -> BindGroup {
         let size = wgpu::Extent3d {
             width: 2,
             height: 2,
@@ -345,7 +355,10 @@ impl TextureManager {
                 origin: wgpu::Origin3d::ZERO,
                 aspect: wgpu::TextureAspect::All,
             },
-            image::load_from_memory(include_bytes!("error.png")).unwrap().as_rgba8().unwrap(),
+            image::load_from_memory(include_bytes!("error.png"))
+                .unwrap()
+                .as_rgba8()
+                .unwrap(),
             wgpu::ImageDataLayout {
                 offset: 0,
                 bytes_per_row: NonZeroU32::new(4 * 2),

@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use glam::Vec2;
 use winit::dpi::PhysicalPosition;
-use winit::event::{KeyboardInput, MouseButton, ScanCode, ElementState};
+use winit::event::{ElementState, KeyboardInput, MouseButton, ScanCode};
 
 pub struct Input {
     keys: HashMap<ScanCode, InputState>,
@@ -53,7 +53,8 @@ impl Input {
             InputState::Released => *state = InputState::Up,
             _ => {}
         });
-        self.buttons.retain(|_, state| *state != InputState::Released);
+        self.buttons
+            .retain(|_, state| *state != InputState::Released);
 
         self.mouse_mov = Vec2::ZERO;
     }

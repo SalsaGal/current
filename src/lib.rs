@@ -9,7 +9,7 @@ use graphics::{Frame, Graphics};
 use winit::dpi::PhysicalSize;
 use winit::event::{Event, WindowEvent};
 use winit::event_loop::{ControlFlow, EventLoop};
-use winit::window::{WindowBuilder, Window};
+use winit::window::{Window, WindowBuilder};
 
 use crate::input::Input;
 
@@ -118,7 +118,9 @@ where
                     WindowEvent::CloseRequested => *control_flow = ControlFlow::Exit,
                     WindowEvent::CursorMoved { position, .. } => input.handle_cursor(position),
                     WindowEvent::KeyboardInput { input: event, .. } => input.handle_key(event),
-                    WindowEvent::MouseInput { button, state, .. } => input.handle_button(button, state),
+                    WindowEvent::MouseInput { button, state, .. } => {
+                        input.handle_button(button, state)
+                    }
                     WindowEvent::Resized(size) => graphics.resize(size),
                     WindowEvent::ScaleFactorChanged { new_inner_size, .. } => {
                         graphics.resize(*new_inner_size)
