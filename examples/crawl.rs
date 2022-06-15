@@ -1,6 +1,6 @@
 use std::f32::consts::TAU;
 
-use current::graphics::{Frame, Graphics};
+use current::graphics::Frame;
 use current::input::InputState;
 use current::sprite::{Filter, Sprite, Transform};
 use current::{Game, GameData, GameExt};
@@ -42,7 +42,7 @@ impl From<Direction> for f32 {
 impl Game for Crawl {
     fn init(data: &mut GameData) -> Self {
         data.graphics.background_color = Color::BLUE;
-        let player_pos = UVec2::new(4, 4);
+        let player_pos = UVec2::new(0, 0);
         Self {
             player_pos,
             player_direction: Direction::Up,
@@ -52,7 +52,6 @@ impl Game for Crawl {
                 Filter::Linear,
             )
             .with_transform(player_transform(
-                data.graphics,
                 player_pos,
                 Direction::Up,
             )),
@@ -84,7 +83,6 @@ impl Game for Crawl {
 
         if modified {
             self.player_sprite.set_transform(player_transform(
-                data.graphics,
                 self.player_pos,
                 self.player_direction,
             ));
@@ -96,12 +94,10 @@ impl Game for Crawl {
     }
 }
 
-fn player_transform(graphics: &Graphics, pos: UVec2, direction: Direction) -> Transform {
+fn player_transform(pos: UVec2, direction: Direction) -> Transform {
     Transform {
-        translation: graphics
-            .pixel_to_screen_pos(pos.as_vec2() * Vec2::new(32.0, 32.0))
-            .extend(0.0),
-        scale: graphics.pixel_to_screen_size(Vec2::new(32.0, 32.0)),
+        translation: (pos.as_vec2() * Vec2::new(32.0, 32.0)).extend(0.0),
+        scale: Vec2::new(32.0, 32.0),
         ..Default::default()
     }
     .with_straight_rotation(direction.into())

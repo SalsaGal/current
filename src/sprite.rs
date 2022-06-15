@@ -140,7 +140,7 @@ impl Sprite {
                 label: None,
                 contents: bytemuck::cast_slice(&[
                     ColorVertex {
-                        position: [-1.0, -1.0, 0.0],
+                        position: [-0.5, -0.5, 0.0],
                         color: [
                             color.r as f32,
                             color.g as f32,
@@ -149,7 +149,7 @@ impl Sprite {
                         ],
                     },
                     ColorVertex {
-                        position: [1.0, -1.0, 0.0],
+                        position: [0.5, -0.5, 0.0],
                         color: [
                             color.r as f32,
                             color.g as f32,
@@ -158,7 +158,7 @@ impl Sprite {
                         ],
                     },
                     ColorVertex {
-                        position: [1.0, 1.0, 0.0],
+                        position: [0.5, 0.5, 0.0],
                         color: [
                             color.r as f32,
                             color.g as f32,
@@ -167,7 +167,7 @@ impl Sprite {
                         ],
                     },
                     ColorVertex {
-                        position: [-1.0, 1.0, 0.0],
+                        position: [-0.5, 0.5, 0.0],
                         color: [
                             color.r as f32,
                             color.g as f32,
@@ -214,19 +214,19 @@ impl Sprite {
                 label: None,
                 contents: bytemuck::cast_slice(&[
                     TextureVertex {
-                        position: [-1.0, -1.0, 0.0],
+                        position: [-0.5, -0.5, 0.0],
                         tex_coords: [0.0, 1.0],
                     },
                     TextureVertex {
-                        position: [1.0, -1.0, 0.0],
+                        position: [0.5, -0.5, 0.0],
                         tex_coords: [1.0, 1.0],
                     },
                     TextureVertex {
-                        position: [1.0, 1.0, 0.0],
+                        position: [0.5, 0.5, 0.0],
                         tex_coords: [1.0, 0.0],
                     },
                     TextureVertex {
-                        position: [-1.0, 1.0, 0.0],
+                        position: [-0.5, 0.5, 0.0],
                         tex_coords: [0.0, 0.0],
                     },
                 ]),
@@ -353,11 +353,11 @@ impl Transform {
         let projection = Mat4::orthographic_rh(-half.x, half.x, -half.y, half.y, -1.0, 1.0);
 
         (
-            Mat4::from_scale_rotation_translation(
+            projection * Mat4::from_scale_rotation_translation(
                 self.scale.extend(1.0),
                 self.rotation,
                 self.translation,
-            ) * projection
+            )
         ).to_cols_array_2d()
     }
 

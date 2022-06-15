@@ -229,17 +229,6 @@ impl Graphics {
     pub fn get_screen_size(&self) -> Vec2 {
         glam::UVec2::new(self.config.width, self.config.height).as_vec2()
     }
-
-    pub fn pixel_to_screen_size(&self, size: Vec2) -> Vec2 {
-        size / self.get_screen_size()
-    }
-
-    /// Convert the position of a pixel into a position that would be
-    /// useful to rendering space (which spans from -1.0 to 1.0, regardless
-    /// of screen size).
-    pub fn pixel_to_screen_pos(&self, pos: Vec2) -> Vec2 {
-        pos / self.get_screen_size() * 2.0 - 1.0
-    }
 }
 
 /// A handle for structures that are needed during rendering itself.
