@@ -6,7 +6,7 @@ use image::{DynamicImage, GenericImageView};
 use indexmap::IndexMap;
 use wgpu::{
     BindGroup, BindGroupLayout, Color, Device, Queue, RenderPass, RenderPipeline, Sampler, Surface,
-    SurfaceConfiguration,
+    SurfaceConfiguration, TextureView,
 };
 use winit::dpi::PhysicalSize;
 use winit::window::Window;
@@ -21,6 +21,7 @@ pub struct Graphics {
     pub(crate) config: SurfaceConfiguration,
 
     pub texture_manager: TextureManager,
+    depth_texture: TextureView,
 
     color_pipeline: RenderPipeline,
     texture_pipeline: RenderPipeline,
@@ -71,6 +72,8 @@ impl Graphics {
             Filter::Nearest,
         );
 
+        let depth_texture = Self::make_depth_texture(&device, &config);
+
         let color_shader = device.create_shader_module(&wgpu::ShaderModuleDescriptor {
             label: Some("color_shader"),
             source: wgpu::ShaderSource::Wgsl(include_str!("color.wgsl").into()),
@@ -109,7 +112,13 @@ impl Graphics {
                 polygon_mode: wgpu::PolygonMode::Fill,
                 conservative: false,
             },
-            depth_stencil: None,
+            depth_stencil: Some(wgpu::DepthStencilState {
+                format: wgpu::TextureFormat::Depth32Float,
+                depth_write_enabled: true,
+                depth_compare: wgpu::CompareFunction::Less,
+                stencil: wgpu::StencilState::default(),
+                bias: wgpu::DepthBiasState::default(),
+            }),
             multisample: wgpu::MultisampleState {
                 count: 1,
                 mask: !0,
@@ -172,11 +181,32 @@ impl Graphics {
             config,
 
             texture_manager,
+            depth_texture,
 
             color_pipeline,
             texture_pipeline,
             background_color: Color::BLACK,
         }
+    }
+
+    fn make_depth_texture(device: &Device, config: &SurfaceConfiguration) -> TextureView {
+        let size = wgpu::Extent3d {
+            width: config.width,
+            height: config.height,
+            depth_or_array_layers: 1,
+        };
+
+        let texture = device.create_texture(&wgpu::TextureDescriptor {
+            label: Some("depth_texture"),
+            size,
+            mip_level_count: 1,
+            sample_count: 1,
+            dimension: wgpu::TextureDimension::D2,
+            format: wgpu::TextureFormat::Depth32Float,
+            usage: wgpu::TextureUsages::RENDER_ATTACHMENT | wgpu::TextureUsages::TEXTURE_BINDING,
+        });
+
+        texture.create_view(&wgpu::TextureViewDescriptor::default())
     }
 
     pub(crate) fn render<F: FnMut(Frame)>(&mut self, mut function: F) {
@@ -200,7 +230,14 @@ impl Graphics {
                         store: true,
                     },
                 }],
-                depth_stencil_attachment: None,
+                depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
+                    view: &self.depth_texture,
+                    depth_ops: Some(wgpu::Operations {
+                        load: wgpu::LoadOp::Clear(1.0),
+                        store: true,
+                    }),
+                    stencil_ops: None,
+                }),
             });
 
             let frame = Frame {
@@ -223,6 +260,7 @@ impl Graphics {
         self.config.width = size.width;
         self.config.height = size.height;
         self.surface.configure(&self.device, &self.config);
+        self.depth_texture = Self::make_depth_texture(&self.device, &self.config);
     }
 
     /// Get the size of the window's renderable surface
