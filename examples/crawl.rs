@@ -42,8 +42,9 @@ impl From<Direction> for f32 {
 impl Game for Crawl {
     fn init(data: &mut GameData) -> Self {
         data.graphics.background_color = Color::BLUE;
+        let player_pos = UVec2::new(4, 4);
         Self {
-            player_pos: (0, 0).into(),
+            player_pos,
             player_direction: Direction::Up,
             player_sprite: Sprite::new_path_rect(
                 data.graphics,
@@ -52,7 +53,7 @@ impl Game for Crawl {
             )
             .with_transform(player_transform(
                 data.graphics,
-                (0, 0).into(),
+                player_pos,
                 Direction::Up,
             )),
         }

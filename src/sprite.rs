@@ -93,7 +93,7 @@ impl Sprite {
 
             transform_buffer: graphics.device.create_buffer_init(&BufferInitDescriptor {
                 label: None,
-                contents: bytemuck::cast_slice(&[transform.matrix()]),
+                contents: bytemuck::cast_slice(&[transform.matrix(graphics.get_screen_size())]),
                 usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
             }),
             transform,
@@ -124,7 +124,7 @@ impl Sprite {
 
             transform_buffer: graphics.device.create_buffer_init(&BufferInitDescriptor {
                 label: None,
-                contents: bytemuck::cast_slice(&[transform.matrix()]),
+                contents: bytemuck::cast_slice(&[transform.matrix(graphics.get_screen_size())]),
                 usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
             }),
             transform,
@@ -188,7 +188,7 @@ impl Sprite {
 
             transform_buffer: graphics.device.create_buffer_init(&BufferInitDescriptor {
                 label: None,
-                contents: bytemuck::cast_slice(&[transform.matrix()]),
+                contents: bytemuck::cast_slice(&[transform.matrix(graphics.get_screen_size())]),
                 usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
             }),
             transform,
@@ -242,7 +242,7 @@ impl Sprite {
 
             transform_buffer: graphics.device.create_buffer_init(&BufferInitDescriptor {
                 label: None,
-                contents: bytemuck::cast_slice(&[transform.matrix()]),
+                contents: bytemuck::cast_slice(&[transform.matrix(graphics.get_screen_size())]),
                 usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
             }),
             transform,
@@ -255,7 +255,7 @@ impl Sprite {
             frame.queue.write_buffer(
                 &self.transform_buffer,
                 0,
-                bytemuck::cast_slice(&[self.transform.matrix()]),
+                bytemuck::cast_slice(&[self.transform.matrix(frame.window_size)]),
             );
         }
 
@@ -348,13 +348,17 @@ impl Transform {
         self
     }
 
-    fn matrix(&self) -> [[f32; 4]; 4] {
-        Mat4::from_scale_rotation_translation(
-            self.scale.extend(1.0),
-            self.rotation,
-            self.translation,
-        )
-        .to_cols_array_2d()
+    fn matrix(&self, window_size: Vec2) -> [[f32; 4]; 4] {
+        let half = window_size / 2.0;
+        let projection = Mat4::orthographic_rh(-half.x, half.x, -half.y, half.y, -1.0, 1.0);
+
+        (
+            Mat4::from_scale_rotation_translation(
+                self.scale.extend(1.0),
+                self.rotation,
+                self.translation,
+            ) * projection
+        ).to_cols_array_2d()
     }
 
     pub(crate) fn desc<'a>() -> VertexBufferLayout<'a> {

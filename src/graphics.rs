@@ -204,6 +204,7 @@ impl Graphics {
             });
 
             let frame = Frame {
+                window_size: self.get_screen_size(),
                 texture_manager: &self.texture_manager,
                 render_pass,
                 color_pipeline: &self.color_pipeline,
@@ -243,6 +244,7 @@ impl Graphics {
 
 /// A handle for structures that are needed during rendering itself.
 pub struct Frame<'a> {
+    pub window_size: Vec2,
     pub texture_manager: &'a TextureManager,
     pub(crate) render_pass: RenderPass<'a>,
     pub(crate) color_pipeline: &'a RenderPipeline,
