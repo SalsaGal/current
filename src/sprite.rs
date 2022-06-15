@@ -250,6 +250,50 @@ impl Sprite {
         }
     }
 
+    pub fn new_label_rect(graphics: &Graphics) -> Self {
+        let transform = Transform::default();
+
+        Self {
+            vertex_buffer: graphics.device.create_buffer_init(&BufferInitDescriptor {
+                label: None,
+                contents: bytemuck::cast_slice(&[
+                    TextureVertex {
+                        position: [-0.5, -0.5, 0.0],
+                        tex_coords: [0.0, 1.0],
+                    },
+                    TextureVertex {
+                        position: [0.5, -0.5, 0.0],
+                        tex_coords: [1.0, 1.0],
+                    },
+                    TextureVertex {
+                        position: [0.5, 0.5, 0.0],
+                        tex_coords: [1.0, 0.0],
+                    },
+                    TextureVertex {
+                        position: [-0.5, 0.5, 0.0],
+                        tex_coords: [0.0, 0.0],
+                    },
+                ]),
+                usage: wgpu::BufferUsages::VERTEX,
+            }),
+            index_buffer: graphics.device.create_buffer_init(&BufferInitDescriptor {
+                label: None,
+                contents: bytemuck::cast_slice::<u16, u8>(&[0, 1, 2, 0, 2, 3]),
+                usage: wgpu::BufferUsages::INDEX,
+            }),
+            index_count: 6,
+            ty: SpriteType::Texture(todo!()),
+
+            transform_buffer: graphics.device.create_buffer_init(&BufferInitDescriptor {
+                label: None,
+                contents: bytemuck::cast_slice(&[transform.matrix(graphics.get_screen_size())]),
+                usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
+            }),
+            transform,
+            transform_outdated: false,
+        }
+    }
+
     pub fn render_to<'a>(&'a self, frame: &mut Frame<'a>) {
         if self.transform_outdated {
             frame.queue.write_buffer(

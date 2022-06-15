@@ -1,2 +1,2 @@
 [default]
-cargo run --example rotate
+cargo run --example text

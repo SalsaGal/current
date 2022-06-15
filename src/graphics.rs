@@ -18,7 +18,7 @@ pub struct Graphics {
     pub device: Device,
     pub queue: Queue,
     surface: Surface,
-    config: SurfaceConfiguration,
+    pub(crate) config: SurfaceConfiguration,
 
     pub texture_manager: TextureManager,
 
