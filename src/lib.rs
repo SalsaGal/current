@@ -1,7 +1,6 @@
 pub mod graphics;
 pub mod input;
 pub mod sprite;
-pub mod text;
 
 use std::time::{Duration, Instant};
 
