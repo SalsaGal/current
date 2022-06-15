@@ -20,9 +20,8 @@ struct Rotate {
 impl Game for Rotate {
     fn init(data: &mut GameData) -> Self {
         Self {
-            sprite: Sprite::new_color_rect(data.graphics, Color::RED).with_transform(
-                Transform::scale(Vec2::new(32.0, 32.0)),
-            ),
+            sprite: Sprite::new_color_rect(data.graphics, Color::RED)
+                .with_transform(Transform::scale(Vec2::new(32.0, 32.0))),
             angle: 0.0,
         }
     }

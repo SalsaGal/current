@@ -352,13 +352,13 @@ impl Transform {
         let half = window_size / 2.0;
         let projection = Mat4::orthographic_rh(-half.x, half.x, -half.y, half.y, -1.0, 1.0);
 
-        (
-            projection * Mat4::from_scale_rotation_translation(
+        (projection
+            * Mat4::from_scale_rotation_translation(
                 self.scale.extend(1.0),
                 self.rotation,
                 self.translation,
-            )
-        ).to_cols_array_2d()
+            ))
+        .to_cols_array_2d()
     }
 
     pub(crate) fn desc<'a>() -> VertexBufferLayout<'a> {

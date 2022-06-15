@@ -51,10 +51,7 @@ impl Game for Crawl {
                 "examples/test.png",
                 Filter::Linear,
             )
-            .with_transform(player_transform(
-                player_pos,
-                Direction::Up,
-            )),
+            .with_transform(player_transform(player_pos, Direction::Up)),
         }
     }
 
@@ -82,10 +79,8 @@ impl Game for Crawl {
         }
 
         if modified {
-            self.player_sprite.set_transform(player_transform(
-                self.player_pos,
-                self.player_direction,
-            ));
+            self.player_sprite
+                .set_transform(player_transform(self.player_pos, self.player_direction));
         }
     }
 
