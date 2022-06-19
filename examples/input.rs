@@ -18,16 +18,16 @@ impl Game for Rect {
     fn init(data: &mut GameData) -> Self {
         Self {
             rect: Sprite::new_color_rect(data.graphics, Color::RED).with_transform(Transform {
-                scale: Vec2::new(0.25, 0.25),
+                scale: Vec2::new(64.0, 64.0),
                 ..Default::default()
             }),
-            i: 0.25,
+            i: 64.0,
         }
     }
 
     fn update(&mut self, data: &mut GameData) {
         if data.input.is_key(17, InputState::Pressed) {
-            self.i += 0.25;
+            self.i += 32.0;
             let mut transform = self.rect.transform;
             transform = transform.with_scale(Vec2::new(self.i, self.i));
             self.rect.set_transform(transform);
