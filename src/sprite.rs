@@ -101,10 +101,27 @@ impl Sprite {
         }
     }
 
+    pub fn new_path_mesh(
+        graphics: &mut Graphics,
+        vertices: &[TextureVertex],
+        indices: &[u16],
+        path: &str,
+        filter: Filter,
+    ) -> Self {
+        let id = graphics.texture_manager.make_texture(
+            &graphics.device,
+            &graphics.queue,
+            image::open(path).unwrap(),
+            filter,
+        );
+        Self::new_texture_mesh(&graphics, vertices, indices, id)
+    }
+
     pub fn new_texture_mesh(
         graphics: &Graphics,
         vertices: &[TextureVertex],
         indices: &[u16],
+        texture_id: TextureID,
     ) -> Self {
         let transform = Transform::default();
 
@@ -120,7 +137,7 @@ impl Sprite {
                 usage: wgpu::BufferUsages::INDEX,
             }),
             index_count: indices.len() as u32,
-            ty: SpriteType::Color,
+            ty: SpriteType::Texture(texture_id),
 
             transform_buffer: graphics.device.create_buffer_init(&BufferInitDescriptor {
                 label: None,

@@ -24,8 +24,7 @@ impl Game for Rotate {
             sprite: Sprite::new_color_rect(data.graphics, Color::RED)
                 .with_transform(Transform::scale(Vec2::new(32.0, 32.0))),
             back: Sprite::new_color_rect(data.graphics, Color::GREEN).with_transform(
-                Transform::scale(Vec2::new(64.0, 64.0))
-                    .with_translation((0.0, 0.0, -1.0).into())
+                Transform::scale(Vec2::new(64.0, 64.0)).with_translation((0.0, 0.0, -1.0).into()),
             ),
             angle: 0.0,
         }
