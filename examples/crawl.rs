@@ -4,7 +4,7 @@ use current::graphics::Frame;
 use current::input::InputState;
 use current::sprite::{Filter, Sprite, Transform};
 use current::{Game, GameData, GameExt};
-use glam::{UVec2, Vec2};
+use glam::{IVec2, Vec2};
 use wgpu::Color;
 
 fn main() {
@@ -15,7 +15,7 @@ fn main() {
 }
 
 struct Crawl {
-    player_pos: UVec2,
+    player_pos: IVec2,
     player_direction: Direction,
     player_sprite: Sprite,
 }
@@ -42,7 +42,7 @@ impl From<Direction> for f32 {
 impl Game for Crawl {
     fn init(data: &mut GameData) -> Self {
         data.graphics.background_color = Color::BLUE;
-        let player_pos = UVec2::new(0, 0);
+        let player_pos = IVec2::ZERO;
         Self {
             player_pos,
             player_direction: Direction::Up,
@@ -89,7 +89,7 @@ impl Game for Crawl {
     }
 }
 
-fn player_transform(pos: UVec2, direction: Direction) -> Transform {
+fn player_transform(pos: IVec2, direction: Direction) -> Transform {
     Transform {
         translation: (pos.as_vec2() * Vec2::new(32.0, 32.0)).extend(0.0),
         scale: Vec2::new(32.0, 32.0),
