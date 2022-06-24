@@ -14,7 +14,7 @@ struct Image {
 impl Game for Image {
     fn init(data: &mut GameData) -> Self {
         Self {
-            rect: Sprite::new_texture_rect(data.graphics, 0).with_transform(Transform {
+            rect: Sprite::new_texture_rect(data.graphics, 5).with_transform(Transform {
                 translation: (-160.0, 0.0, 0.0).into(),
                 scale: (320.0, 480.0).into(),
                 ..Default::default()

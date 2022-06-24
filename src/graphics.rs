@@ -65,13 +65,6 @@ impl Graphics {
         surface.configure(&device, &config);
 
         let mut texture_manager = TextureManager::new(&device, &queue);
-        texture_manager.make_texture(
-            &device,
-            &queue,
-            image::load_from_memory(include_bytes!("error.png")).unwrap(),
-            Filter::Nearest,
-        );
-
         let depth_texture = Self::make_depth_texture(&device, &config);
 
         let color_shader = device.create_shader_module(&wgpu::ShaderModuleDescriptor {
