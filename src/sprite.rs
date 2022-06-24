@@ -114,7 +114,7 @@ impl Sprite {
             image::open(path).unwrap(),
             filter,
         );
-        Self::new_texture_mesh(&graphics, vertices, indices, id)
+        Self::new_texture_mesh(graphics, vertices, indices, id)
     }
 
     pub fn new_texture_mesh(
