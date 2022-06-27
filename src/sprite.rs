@@ -331,6 +331,10 @@ pub struct Transform {
     pub translation: Vec3,
     pub rotation: Quat,
     pub scale: Vec2,
+    /// Whether the scale uses pixel positions, or gpu positions (-1 to 1).
+    /// This will be true for a sprite that is scaled when the window is
+    /// scaled.
+    pub window: bool,
 }
 
 macro_rules! transform_methods {
@@ -358,7 +362,7 @@ macro_rules! transform_methods {
 }
 
 impl Transform {
-    transform_methods!(translation: Vec3, rotation: Quat, scale: Vec2);
+    transform_methods!(translation: Vec3, rotation: Quat, scale: Vec2, window: bool);
 
     pub fn with_straight_rotation(mut self, angle: f32) -> Self {
         self.rotation = Quat::from_euler(glam::EulerRot::XYZ, 0.0, 0.0, angle);
@@ -367,7 +371,11 @@ impl Transform {
 
     fn matrix(&self, window_size: Vec2) -> [[f32; 4]; 4] {
         let half = window_size / 2.0;
-        let projection = Mat4::orthographic_rh(-half.x, half.x, -half.y, half.y, -100.0, 100.0);
+        let projection = if self.window {
+            Mat4::orthographic_rh(-1.0, 1.0, -1.0, 1.0, -100.0, 100.0)
+        } else {
+            Mat4::orthographic_rh(-half.x, half.x, -half.y, half.y, -100.0, 100.0)
+        };
 
         (projection
             * Mat4::from_scale_rotation_translation(
@@ -414,6 +422,7 @@ impl Default for Transform {
             translation: Vec3::ZERO,
             rotation: Quat::IDENTITY,
             scale: Vec2::ONE,
+            window: false,
         }
     }
 }
