@@ -4,7 +4,7 @@ use glam::{Mat4, Quat, Vec2, Vec3};
 use wgpu::util::{BufferInitDescriptor, DeviceExt};
 use wgpu::{Buffer, Color, VertexAttribute, VertexBufferLayout};
 
-use crate::graphics::{Frame, Graphics, TextureID};
+use crate::graphics::{FontID, Frame, Graphics, TextureID};
 
 #[repr(C)]
 #[derive(Clone, Copy, Debug, bytemuck::Pod, bytemuck::Zeroable)]
@@ -219,6 +219,30 @@ impl Sprite {
             &graphics.queue,
             image::open(path).unwrap(),
             filter,
+        );
+        Self::new_texture_rect(graphics, id)
+    }
+
+    pub fn new_text_rect(
+        graphics: &mut Graphics,
+        font: FontID,
+        text: &str,
+        size: u16,
+        color: Color,
+    ) -> Self {
+        let font = &graphics.fonts[font];
+        let color = text_to_png::Color::new(
+            (color.r * 255.0) as u8,
+            (color.g * 255.0) as u8,
+            (color.b * 255.0) as u8,
+        );
+        let png = font.render_text_to_png_data(text, size, color).unwrap();
+        let image = image::load_from_memory(&png.data).unwrap();
+        let id = graphics.texture_manager.make_texture(
+            &graphics.device,
+            &graphics.queue,
+            image,
+            Filter::Linear,
         );
         Self::new_texture_rect(graphics, id)
     }

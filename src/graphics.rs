@@ -4,6 +4,7 @@ use std::ops::Index;
 use glam::Vec2;
 use image::{DynamicImage, GenericImageView};
 use indexmap::IndexMap;
+use text_to_png::TextRenderer;
 use wgpu::{
     BindGroup, BindGroupLayout, Color, Device, Queue, RenderPass, RenderPipeline, Sampler, Surface,
     SurfaceConfiguration, TextureView,
@@ -13,6 +14,9 @@ use winit::window::Window;
 
 use crate::sprite::{ColorVertex, Filter, TextureVertex, Transform};
 
+pub type Font = TextRenderer;
+pub type FontID = usize;
+
 /// The core component that handles all general purpose graphics.
 pub struct Graphics {
     pub device: Device,
@@ -20,6 +24,8 @@ pub struct Graphics {
     surface: Surface,
     pub(crate) config: SurfaceConfiguration,
 
+    pub fonts: IndexMap<FontID, Font>,
+    next_font: FontID,
     pub texture_manager: TextureManager,
     depth_texture: TextureView,
 
@@ -179,6 +185,8 @@ impl Graphics {
             surface,
             config,
 
+            fonts: IndexMap::new(),
+            next_font: 0,
             texture_manager,
             depth_texture,
 
@@ -265,6 +273,14 @@ impl Graphics {
     /// Get the size of the window's renderable surface
     pub fn get_screen_size(&self) -> Vec2 {
         glam::UVec2::new(self.config.width, self.config.height).as_vec2()
+    }
+
+    pub fn load_font(&mut self, path: &str) -> FontID {
+        let contents = std::fs::read(path).unwrap();
+        let font = TextRenderer::try_new_with_ttf_font_data(&contents).unwrap();
+        self.fonts.insert(self.next_font, font);
+        self.next_font += 1;
+        self.next_font - 1
     }
 }
 
