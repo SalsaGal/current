@@ -229,6 +229,7 @@ impl Sprite {
         text: &str,
         size: u16,
         color: Color,
+        filter: Filter,
     ) -> Self {
         let font = &graphics.fonts[font];
         let color = text_to_png::Color::new(
@@ -242,7 +243,7 @@ impl Sprite {
             &graphics.device,
             &graphics.queue,
             image,
-            Filter::Linear,
+            filter,
         );
         Self::new_texture_rect(graphics, id)
     }

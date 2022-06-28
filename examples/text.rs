@@ -21,7 +21,7 @@ impl Game for TextDemo {
             .load_font("examples/LiberationSans-Regular.ttf");
         Self {
             font,
-            sprite: Sprite::new_text_rect(data.graphics, font, "Text", 512, Color::GREEN)
+            sprite: Sprite::new_text_rect(data.graphics, font, "Text", 512, Color::GREEN, sprite::Filter::Linear)
                 .with_transform(Transform::scale((512.0, 512.0).into())),
             text: "Text".to_owned(),
         }
@@ -31,7 +31,7 @@ impl Game for TextDemo {
         if data.input.is_key(31, input::InputState::Pressed) {
             self.text.push('#');
             self.sprite =
-                Sprite::new_text_rect(data.graphics, self.font, &self.text, 512, Color::WHITE)
+                Sprite::new_text_rect(data.graphics, self.font, &self.text, 512, Color::WHITE, sprite::Filter::Linear)
                     .with_transform(Transform::scale((512.0, 512.0).into()));
         }
     }
