@@ -9,7 +9,7 @@ use graphics::{Frame, Graphics};
 use winit::dpi::PhysicalSize;
 use winit::event::{Event, WindowEvent};
 use winit::event_loop::{ControlFlow, EventLoop};
-use winit::window::{Window, WindowBuilder, Fullscreen};
+use winit::window::{Fullscreen, Window, WindowBuilder};
 
 use crate::input::Input;
 
@@ -82,12 +82,10 @@ where
             .with_title(init.window_title)
             .with_inner_size(PhysicalSize::new(init.window_size.x, init.window_size.y))
             .with_resizable(init.window_resizable)
-            .with_fullscreen(
-                match init.window_fullscreen {
-                    true => Some(Fullscreen::Borderless(None)),
-                    false => None,
-                }
-            )
+            .with_fullscreen(match init.window_fullscreen {
+                true => Some(Fullscreen::Borderless(None)),
+                false => None,
+            })
             .build(&event_loop)
             .unwrap();
 
