@@ -23,7 +23,7 @@ pub struct Graphics {
     pub queue: Queue,
     surface: Surface,
     pub(crate) config: SurfaceConfiguration,
-    pub frame_size: Vec2,
+    pub frame_size: Option<Vec2>,
 
     pub fonts: IndexMap<FontID, Font>,
     next_font: FontID,
@@ -185,7 +185,7 @@ impl Graphics {
             queue,
             surface,
             config,
-            frame_size: (size.width as f32, size.height as f32).into(),
+            frame_size: None,
 
             fonts: IndexMap::new(),
             next_font: 0,
@@ -250,7 +250,7 @@ impl Graphics {
             });
 
             let frame = Frame {
-                frame_size: self.frame_size,
+                frame_size: self.frame_size.unwrap_or_else(|| self.get_screen_size()),
                 texture_manager: &self.texture_manager,
                 render_pass,
                 color_pipeline: &self.color_pipeline,

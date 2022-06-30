@@ -13,7 +13,7 @@ struct Image {
 
 impl Game for Image {
     fn init(data: &mut GameData) -> Self {
-        data.graphics.frame_size = (2.0, 2.0).into();
+        data.graphics.frame_size = Some((2.0, 2.0).into());
 
         Self {
             rect: Sprite::new_texture_rect(data.graphics, 5).with_transform(Transform {
