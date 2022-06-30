@@ -11,7 +11,6 @@ struct Image {
     test: Sprite,
 }
 
-// TODO Make this example resize the frame
 impl Game for Image {
     fn init(data: &mut GameData) -> Self {
         data.graphics.frame_size = (2.0, 2.0).into();
