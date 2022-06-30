@@ -10,6 +10,7 @@ use wgpu::Color;
 fn main() {
     Crawl::run(current::GameInit {
         window_title: "Crawler",
+        window_fullscreen: true,
         ..Default::default()
     });
 }

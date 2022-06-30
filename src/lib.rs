@@ -9,7 +9,7 @@ use graphics::{Frame, Graphics};
 use winit::dpi::PhysicalSize;
 use winit::event::{Event, WindowEvent};
 use winit::event_loop::{ControlFlow, EventLoop};
-use winit::window::{Window, WindowBuilder};
+use winit::window::{Window, WindowBuilder, Fullscreen};
 
 use crate::input::Input;
 
@@ -18,6 +18,7 @@ pub struct GameInit {
     pub window_resizable: bool,
     pub window_size: UVec2,
     pub window_title: &'static str,
+    pub window_fullscreen: bool,
 }
 
 impl Default for GameInit {
@@ -26,6 +27,7 @@ impl Default for GameInit {
             window_resizable: true,
             window_title: "Current window",
             window_size: UVec2::new(640, 480),
+            window_fullscreen: false,
         }
     }
 }
@@ -80,6 +82,12 @@ where
             .with_title(init.window_title)
             .with_inner_size(PhysicalSize::new(init.window_size.x, init.window_size.y))
             .with_resizable(init.window_resizable)
+            .with_fullscreen(
+                match init.window_fullscreen {
+                    true => Some(Fullscreen::Borderless(None)),
+                    false => None,
+                }
+            )
             .build(&event_loop)
             .unwrap();
 
