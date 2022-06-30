@@ -239,12 +239,10 @@ impl Sprite {
         );
         let png = font.render_text_to_png_data(text, size, color).unwrap();
         let image = image::load_from_memory(&png.data).unwrap();
-        let id = graphics.texture_manager.make_texture(
-            &graphics.device,
-            &graphics.queue,
-            image,
-            filter,
-        );
+        let id =
+            graphics
+                .texture_manager
+                .make_texture(&graphics.device, &graphics.queue, image, filter);
         Self::new_texture_rect(graphics, id)
     }
 
@@ -297,7 +295,7 @@ impl Sprite {
             frame.queue.write_buffer(
                 &self.transform_buffer,
                 0,
-                bytemuck::cast_slice(&[self.transform.matrix(frame.window_size)]),
+                bytemuck::cast_slice(&[self.transform.matrix(frame.frame_size)]),
             );
         }
 
@@ -356,10 +354,6 @@ pub struct Transform {
     pub translation: Vec3,
     pub rotation: Quat,
     pub scale: Vec2,
-    /// Whether the scale uses pixel positions, or gpu positions (-1 to 1).
-    /// This will be true for a sprite that is scaled when the window is
-    /// scaled.
-    pub window: bool,
 }
 
 macro_rules! transform_methods {
@@ -387,20 +381,16 @@ macro_rules! transform_methods {
 }
 
 impl Transform {
-    transform_methods!(translation: Vec3, rotation: Quat, scale: Vec2, window: bool);
+    transform_methods!(translation: Vec3, rotation: Quat, scale: Vec2);
 
     pub fn with_straight_rotation(mut self, angle: f32) -> Self {
         self.rotation = Quat::from_euler(glam::EulerRot::XYZ, 0.0, 0.0, angle);
         self
     }
 
-    fn matrix(&self, window_size: Vec2) -> [[f32; 4]; 4] {
-        let half = window_size / 2.0;
-        let projection = if self.window {
-            Mat4::orthographic_rh(-1.0, 1.0, -1.0, 1.0, -100.0, 100.0)
-        } else {
-            Mat4::orthographic_rh(-half.x, half.x, -half.y, half.y, -100.0, 100.0)
-        };
+    fn matrix(&self, frame_size: Vec2) -> [[f32; 4]; 4] {
+        let half = frame_size / 2.0;
+        let projection = Mat4::orthographic_rh(-half.x, half.x, -half.y, half.y, -100.0, 100.0);
 
         (projection
             * Mat4::from_scale_rotation_translation(
@@ -447,7 +437,6 @@ impl Default for Transform {
             translation: Vec3::ZERO,
             rotation: Quat::IDENTITY,
             scale: Vec2::ONE,
-            window: false,
         }
     }
 }

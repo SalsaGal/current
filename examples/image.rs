@@ -11,20 +11,21 @@ struct Image {
     test: Sprite,
 }
 
+// TODO Make this example resize the frame
 impl Game for Image {
     fn init(data: &mut GameData) -> Self {
+        data.graphics.frame_size = (2.0, 2.0).into();
+
         Self {
             rect: Sprite::new_texture_rect(data.graphics, 5).with_transform(Transform {
                 translation: (-0.5, 0.0, 0.0).into(),
                 scale: (1.0, 2.0).into(),
-                window: true,
                 ..Default::default()
             }),
             test: Sprite::new_path_rect(data.graphics, "examples/test.png", Filter::Linear)
                 .with_transform(Transform {
                     translation: (0.5, 0.0, 0.0).into(),
                     scale: (1.0, 2.0).into(),
-                    window: true,
                     ..Default::default()
                 }),
         }

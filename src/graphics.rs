@@ -23,6 +23,7 @@ pub struct Graphics {
     pub queue: Queue,
     surface: Surface,
     pub(crate) config: SurfaceConfiguration,
+    pub frame_size: Vec2,
 
     pub fonts: IndexMap<FontID, Font>,
     next_font: FontID,
@@ -184,6 +185,7 @@ impl Graphics {
             queue,
             surface,
             config,
+            frame_size: (size.width as f32, size.height as f32).into(),
 
             fonts: IndexMap::new(),
             next_font: 0,
@@ -248,7 +250,7 @@ impl Graphics {
             });
 
             let frame = Frame {
-                window_size: self.get_screen_size(),
+                frame_size: self.frame_size,
                 texture_manager: &self.texture_manager,
                 render_pass,
                 color_pipeline: &self.color_pipeline,
@@ -286,7 +288,7 @@ impl Graphics {
 
 /// A handle for structures that are needed during rendering itself.
 pub struct Frame<'a> {
-    pub window_size: Vec2,
+    pub frame_size: Vec2,
     pub texture_manager: &'a TextureManager,
     pub(crate) render_pass: RenderPass<'a>,
     pub(crate) color_pipeline: &'a RenderPipeline,
