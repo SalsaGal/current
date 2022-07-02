@@ -12,6 +12,6 @@ image = "0.24.2"
 indexmap = "1.8.2"
 paste = "1.0.7"
 pollster = "0.2.5"
-text-to-png = "0.2.0"
+text-to-png = { git = "https://github.com/itsfarseen/text-to-png" } 
 wgpu = "0.12.0"
 winit = "0.26.1"

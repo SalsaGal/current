@@ -1,6 +1,7 @@
 use std::mem::size_of;
 
 use glam::{Mat4, Quat, Vec2, Vec3};
+use image::RgbaImage;
 use wgpu::util::{BufferInitDescriptor, DeviceExt};
 use wgpu::{Buffer, Color, VertexAttribute, VertexBufferLayout};
 
@@ -237,8 +238,22 @@ impl Sprite {
             (color.g * 255.0) as u8,
             (color.b * 255.0) as u8,
         );
-        let png = font.render_text_to_png_data(text, size, color).unwrap();
-        let image = image::load_from_memory(&png.data).unwrap();
+        let pixmap = font.render_text_to_pixmap(text, size, color).unwrap();
+        let image = {
+            let width = pixmap.size.width;
+            let height = pixmap.size.height;
+            let mut image = RgbaImage::new(width, height);
+            for index in 0..pixmap.data.data().len() / 4 {
+                let array = [
+                    pixmap.data.data()[index * 4 + 0],
+                    pixmap.data.data()[index * 4 + 1],
+                    pixmap.data.data()[index * 4 + 2],
+                    pixmap.data.data()[index * 4 + 3],
+                ];
+                image.put_pixel(index as u32 % width, index as u32 / width, image::Rgba(array));
+            }
+            image::DynamicImage::ImageRgba8(image)
+        };
         let id =
             graphics
                 .texture_manager
