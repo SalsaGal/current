@@ -250,7 +250,11 @@ impl Sprite {
                     pixmap.data.data()[index * 4 + 2],
                     pixmap.data.data()[index * 4 + 3],
                 ];
-                image.put_pixel(index as u32 % width, index as u32 / width, image::Rgba(array));
+                image.put_pixel(
+                    index as u32 % width,
+                    index as u32 / width,
+                    image::Rgba(array),
+                );
             }
             image::DynamicImage::ImageRgba8(image)
         };
