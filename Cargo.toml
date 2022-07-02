@@ -10,7 +10,7 @@ bytemuck = { version = "1.9.1", features = ["derive"] }
 glam = "0.20.5"
 image = "0.24.2"
 indexmap = "1.8.2"
-kari = "0.1.0"
+kira = { version = "0.6.0", features = ["flac"] }
 paste = "1.0.7"
 pollster = "0.2.5"
 text-to-png = { git = "https://github.com/itsfarseen/text-to-png" } 

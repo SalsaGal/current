@@ -5,6 +5,7 @@ pub mod sprite;
 
 use std::time::{Duration, Instant};
 
+use audio::Audio;
 use glam::UVec2;
 use graphics::{Frame, Graphics};
 use winit::dpi::PhysicalSize;
@@ -90,6 +91,7 @@ where
             .build(&event_loop)
             .unwrap();
 
+        let mut audio = Audio::new();
         let mut graphics = pollster::block_on(Graphics::new(&window));
         let mut input = Input::new();
 
