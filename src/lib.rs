@@ -36,6 +36,7 @@ impl Default for GameInit {
 
 /// A struct containing references to all core components of the library.
 pub struct GameData<'a> {
+    pub audio: &'a mut Audio,
     pub graphics: &'a mut Graphics,
     pub input: &'a Input,
     /// The time since the last update.
@@ -96,6 +97,7 @@ where
         let mut input = Input::new();
 
         let mut game_data = GameData {
+            audio: &mut audio,
             graphics: &mut graphics,
             input: &input,
             delta_time: Duration::from_secs(0),
@@ -106,6 +108,7 @@ where
         let mut last_update = Instant::now();
         event_loop.run(move |event, _, control_flow| {
             let mut game_data = GameData {
+                audio: &mut audio,
                 graphics: &mut graphics,
                 input: &input,
                 delta_time: Instant::now() - last_update,

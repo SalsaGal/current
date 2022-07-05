@@ -5,13 +5,9 @@ pub struct Audio {
 }
 
 impl Audio {
-    pub(crate) fn new() -> Option<Self> {
-        match AudioManager::<CpalBackend>::new(AudioManagerSettings::default()) {
-            Ok(manager) => Some(Self { manager }),
-            Err(err) => {
-                eprintln!("Error creating audio handler:\n{:?}", err);
-                None
-            }
+    pub(crate) fn new() -> Self {
+        Self {
+            manager: AudioManager::<CpalBackend>::new(AudioManagerSettings::default()).unwrap(),
         }
     }
 }
