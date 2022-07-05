@@ -19,6 +19,11 @@ struct Crawl {
     player_pos: IVec2,
     player_direction: Direction,
     player_sprite: Sprite,
+
+    point_pos: IVec2,
+    point_sprite: Sprite,
+
+    points: u32,
 }
 
 #[derive(Clone, Copy)]
@@ -44,6 +49,7 @@ impl Game for Crawl {
     fn init(data: &mut GameData) -> Self {
         data.graphics.background_color = Color::BLUE;
         let player_pos = IVec2::ZERO;
+        let point_pos = IVec2::new(5, 8);
         Self {
             player_pos,
             player_direction: Direction::Up,
@@ -52,7 +58,13 @@ impl Game for Crawl {
                 "examples/test.png",
                 Filter::Linear,
             )
-            .with_transform(player_transform(player_pos, Direction::Up)),
+            .with_transform(position_transform(player_pos, Direction::Up)),
+
+            point_pos,
+            point_sprite: Sprite::new_color_rect(data.graphics, Color::GREEN)
+                .with_transform(position_transform(point_pos, Direction::Up)),
+
+            points: 0,
         }
     }
 
@@ -81,16 +93,21 @@ impl Game for Crawl {
 
         if modified {
             self.player_sprite
-                .set_transform(player_transform(self.player_pos, self.player_direction));
+                .set_transform(position_transform(self.player_pos, self.player_direction));
+            if self.player_pos == self.point_pos {
+                self.points += 1;
+                println!("Points: {}", self.points);
+            }
         }
     }
 
     fn render<'a>(&'a mut self, mut frame: Frame<'a>) {
         self.player_sprite.render_to(&mut frame);
+        self.point_sprite.render_to(&mut frame);
     }
 }
 
-fn player_transform(pos: IVec2, direction: Direction) -> Transform {
+fn position_transform(pos: IVec2, direction: Direction) -> Transform {
     Transform {
         translation: (pos.as_vec2() * Vec2::new(32.0, 32.0)).extend(0.0),
         scale: Vec2::new(32.0, 32.0),

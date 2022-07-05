@@ -1,2 +1,2 @@
 [default]
-cargo run --example audio $@
+cargo run --example crawl $@
