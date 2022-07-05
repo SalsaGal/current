@@ -245,7 +245,7 @@ impl Sprite {
             let mut image = RgbaImage::new(width, height);
             for index in 0..pixmap.data.data().len() / 4 {
                 let array = [
-                    pixmap.data.data()[index * 4 + 0],
+                    pixmap.data.data()[index * 4],
                     pixmap.data.data()[index * 4 + 1],
                     pixmap.data.data()[index * 4 + 2],
                     pixmap.data.data()[index * 4 + 3],
