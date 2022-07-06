@@ -1,6 +1,7 @@
 pub mod audio;
 pub mod graphics;
 pub mod input;
+pub mod random;
 pub mod sprite;
 
 use std::time::{Duration, Instant};
