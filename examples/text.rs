@@ -1,5 +1,5 @@
 use current::graphics::FontID;
-use current::sprite::{Sprite, Transform};
+use current::sprite::Sprite;
 use current::*;
 
 use wgpu::Color;
@@ -16,6 +16,7 @@ struct TextDemo {
 
 impl Game for TextDemo {
     fn init(data: &mut GameData) -> Self {
+        data.graphics.frame_size = Some((1000.0, 1000.0).into());
         let font = data
             .graphics
             .load_font("examples/LiberationSans-Regular.ttf");
@@ -25,11 +26,10 @@ impl Game for TextDemo {
                 data.graphics,
                 font,
                 "Text",
-                512,
+                256,
                 Color::GREEN,
                 sprite::Filter::Linear,
-            )
-            .with_transform(Transform::scale((512.0, 512.0).into())),
+            ),
             text: "Text".to_owned(),
         }
     }
@@ -41,11 +41,10 @@ impl Game for TextDemo {
                 data.graphics,
                 self.font,
                 &self.text,
-                512,
+                256,
                 Color::WHITE,
                 sprite::Filter::Linear,
             )
-            .with_transform(Transform::scale((512.0, 512.0).into()));
         }
     }
 

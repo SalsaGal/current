@@ -1,2 +1,2 @@
 [default]
-cargo run --example crawl $@
+cargo run --example text $@

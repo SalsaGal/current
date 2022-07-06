@@ -250,7 +250,7 @@ impl Graphics {
             });
 
             let frame = Frame {
-                frame_size: self.frame_size.unwrap_or_else(|| self.get_screen_size()),
+                frame_size: self.frame_size.unwrap_or_else(|| self.get_window_size()),
                 texture_manager: &self.texture_manager,
                 render_pass,
                 color_pipeline: &self.color_pipeline,
@@ -272,9 +272,14 @@ impl Graphics {
         self.depth_texture = Self::make_depth_texture(&self.device, &self.config);
     }
 
-    /// Get the size of the window's renderable surface
-    pub fn get_screen_size(&self) -> Vec2 {
+    /// Get the size of the window
+    pub fn get_window_size(&self) -> Vec2 {
         glam::UVec2::new(self.config.width, self.config.height).as_vec2()
+    }
+
+    /// Get the size of the renderable frame
+    pub fn get_frame_size(&self) -> Vec2 {
+        self.frame_size.unwrap_or_else(|| self.get_window_size())
     }
 
     pub fn load_font(&mut self, path: &str) -> FontID {

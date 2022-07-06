@@ -94,7 +94,7 @@ impl Sprite {
 
             transform_buffer: graphics.device.create_buffer_init(&BufferInitDescriptor {
                 label: None,
-                contents: bytemuck::cast_slice(&[transform.matrix(graphics.get_screen_size())]),
+                contents: bytemuck::cast_slice(&[transform.matrix(graphics.get_window_size())]),
                 usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
             }),
             transform,
@@ -142,7 +142,7 @@ impl Sprite {
 
             transform_buffer: graphics.device.create_buffer_init(&BufferInitDescriptor {
                 label: None,
-                contents: bytemuck::cast_slice(&[transform.matrix(graphics.get_screen_size())]),
+                contents: bytemuck::cast_slice(&[transform.matrix(graphics.get_window_size())]),
                 usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
             }),
             transform,
@@ -206,7 +206,7 @@ impl Sprite {
 
             transform_buffer: graphics.device.create_buffer_init(&BufferInitDescriptor {
                 label: None,
-                contents: bytemuck::cast_slice(&[transform.matrix(graphics.get_screen_size())]),
+                contents: bytemuck::cast_slice(&[transform.matrix(graphics.get_window_size())]),
                 usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
             }),
             transform,
@@ -262,8 +262,10 @@ impl Sprite {
             graphics
                 .texture_manager
                 .make_texture(&graphics.device, &graphics.queue, image, filter);
-        Self::new_texture_rect(graphics, id)
-            .with_transform(Transform::scale((width as f32, height as f32).into()))
+        let scale = Vec2::new(width as f32, height as f32)
+            * (graphics.get_frame_size() / graphics.get_window_size());
+
+        Self::new_texture_rect(graphics, id).with_transform(Transform::scale(scale))
     }
 
     pub fn new_texture_rect(graphics: &Graphics, id: TextureID) -> Self {
@@ -302,7 +304,7 @@ impl Sprite {
 
             transform_buffer: graphics.device.create_buffer_init(&BufferInitDescriptor {
                 label: None,
-                contents: bytemuck::cast_slice(&[transform.matrix(graphics.get_screen_size())]),
+                contents: bytemuck::cast_slice(&[transform.matrix(graphics.get_window_size())]),
                 usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
             }),
             transform,
