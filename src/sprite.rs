@@ -239,9 +239,9 @@ impl Sprite {
             (color.b * 255.0) as u8,
         );
         let pixmap = font.render_text_to_pixmap(text, size, color).unwrap();
+        let width = pixmap.size.width;
+        let height = pixmap.size.height;
         let image = {
-            let width = pixmap.size.width;
-            let height = pixmap.size.height;
             let mut image = RgbaImage::new(width, height);
             for index in 0..pixmap.data.data().len() / 4 {
                 let array = [
@@ -263,6 +263,7 @@ impl Sprite {
                 .texture_manager
                 .make_texture(&graphics.device, &graphics.queue, image, filter);
         Self::new_texture_rect(graphics, id)
+            .with_transform(Transform::scale((width as f32, height as f32).into()))
     }
 
     pub fn new_texture_rect(graphics: &Graphics, id: TextureID) -> Self {

@@ -84,9 +84,8 @@ impl Game for Crawl {
                 "Points: 0",
                 24,
                 Color::WHITE,
-                Filter::Nearest,
-            )
-            .with_transform(Transform::scale((500.0, 500.0).into())),
+                Filter::Linear,
+            ),
             points: 0,
         }
     }
@@ -126,9 +125,8 @@ impl Game for Crawl {
                     &format!("Points: {}", self.points),
                     24,
                     Color::WHITE,
-                    Filter::Nearest,
+                    Filter::Linear,
                 )
-                .with_transform(Transform::scale((500.0, 500.0).into()));
             }
         }
     }
