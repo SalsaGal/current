@@ -1,9 +1,19 @@
+use std::time::SystemTime;
+
 pub struct Noise {
     pub seed: u32,
     pub index: u32,
 }
 
 impl Noise {
+    pub fn new() -> Self {
+        let seed = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_secs() as u32;
+        Self {
+            seed,
+            index: 0,
+        }
+    }
+
     pub fn from_seed(seed: u32) -> Self {
         Self {
             seed,
@@ -14,8 +24,8 @@ impl Noise {
     pub fn get(&self, index: u32) -> u32 {
         index.wrapping_add(479001599)
             ^ index.wrapping_pow(5)
-            ^ index.rotate_left(7)
-            ^ index.rotate_right(9)
+            ^ self.seed.rotate_left(7)
+            ^ index.rotate_right(1 + (self.seed % 3))
             ^ self.seed.rotate_right(index % self.seed)
     }
 
