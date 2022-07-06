@@ -1,6 +1,6 @@
 use std::f32::consts::TAU;
 
-use current::graphics::Frame;
+use current::graphics::{FontID, Frame};
 use current::input::InputState;
 use current::sprite::{Filter, Sprite, Transform};
 use current::{Game, GameData, GameExt};
@@ -23,6 +23,8 @@ struct Crawl {
     point_pos: IVec2,
     point_sprite: Sprite,
 
+    font: FontID,
+    points_text: Sprite,
     points: u32,
 }
 
@@ -50,6 +52,9 @@ impl Game for Crawl {
         data.graphics.background_color = Color::BLUE;
         let player_pos = IVec2::ZERO;
         let point_pos = IVec2::new(5, 8);
+        let font = data
+            .graphics
+            .load_font("examples/LiberationSans-Regular.ttf");
         Self {
             player_pos,
             player_direction: Direction::Up,
@@ -61,9 +66,27 @@ impl Game for Crawl {
             .with_transform(position_transform(player_pos, Direction::Up)),
 
             point_pos,
-            point_sprite: Sprite::new_color_rect(data.graphics, Color::GREEN)
-                .with_transform(position_transform(point_pos, Direction::Up)),
+            point_sprite: Sprite::new_color_rect(
+                data.graphics,
+                Color {
+                    r: 1.0,
+                    g: 1.0,
+                    b: 1.0,
+                    a: 0.5,
+                },
+            )
+            .with_transform(position_transform(point_pos, Direction::Up)),
 
+            font,
+            points_text: Sprite::new_text_rect(
+                data.graphics,
+                font,
+                "Points: 0",
+                24,
+                Color::WHITE,
+                Filter::Nearest,
+            )
+            .with_transform(Transform::scale((500.0, 500.0).into())),
             points: 0,
         }
     }
@@ -97,6 +120,15 @@ impl Game for Crawl {
             if self.player_pos == self.point_pos {
                 self.points += 1;
                 println!("Points: {}", self.points);
+                self.points_text = Sprite::new_text_rect(
+                    data.graphics,
+                    self.font,
+                    &format!("Points: {}", self.points),
+                    24,
+                    Color::WHITE,
+                    Filter::Nearest,
+                )
+                .with_transform(Transform::scale((500.0, 500.0).into()));
             }
         }
     }
@@ -104,6 +136,7 @@ impl Game for Crawl {
     fn render<'a>(&'a mut self, mut frame: Frame<'a>) {
         self.player_sprite.render_to(&mut frame);
         self.point_sprite.render_to(&mut frame);
+        self.points_text.render_to(&mut frame);
     }
 }
 

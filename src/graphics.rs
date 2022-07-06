@@ -99,7 +99,7 @@ impl Graphics {
                 entry_point: "fragment_main",
                 targets: &[wgpu::ColorTargetState {
                     format: config.format,
-                    blend: Some(wgpu::BlendState::REPLACE),
+                    blend: Some(wgpu::BlendState::ALPHA_BLENDING),
                     write_mask: wgpu::ColorWrites::ALL,
                 }],
             }),
@@ -152,7 +152,7 @@ impl Graphics {
                 entry_point: "fragment_main",
                 targets: &[wgpu::ColorTargetState {
                     format: config.format,
-                    blend: Some(wgpu::BlendState::REPLACE),
+                    blend: Some(wgpu::BlendState::ALPHA_BLENDING),
                     write_mask: wgpu::ColorWrites::ALL,
                 }],
             }),
