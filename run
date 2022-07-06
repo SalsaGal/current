@@ -1,2 +1,2 @@
 [default]
-cargo run --example noise $@
+cargo run --example crawl $@

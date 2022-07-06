@@ -7,18 +7,15 @@ pub struct Noise {
 
 impl Noise {
     pub fn new() -> Self {
-        let seed = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_secs() as u32;
-        Self {
-            seed,
-            index: 0,
-        }
+        let seed = SystemTime::now()
+            .duration_since(SystemTime::UNIX_EPOCH)
+            .unwrap()
+            .as_secs() as u32;
+        Self { seed, index: 0 }
     }
 
     pub fn from_seed(seed: u32) -> Self {
-        Self {
-            seed,
-            index: 0,
-        }
+        Self { seed, index: 0 }
     }
 
     pub fn get(&self, index: u32) -> u32 {

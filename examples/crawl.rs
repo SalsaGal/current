@@ -2,6 +2,7 @@ use std::f32::consts::TAU;
 
 use current::graphics::{FontID, Frame, Graphics};
 use current::input::InputState;
+use current::random::Noise;
 use current::sprite::{Filter, Sprite, Transform};
 use current::{Game, GameData, GameExt};
 use glam::{IVec2, Vec2};
@@ -26,6 +27,7 @@ struct Crawl {
     font: FontID,
     points_text: Sprite,
     points: u32,
+    noise: Noise,
 }
 
 #[derive(Clone, Copy)]
@@ -80,6 +82,7 @@ impl Game for Crawl {
             font,
             points_text: make_text(data.graphics, font, 0),
             points: 0,
+            noise: Noise::new(),
         }
     }
 
@@ -111,7 +114,10 @@ impl Game for Crawl {
                 .set_transform(position_transform(self.player_pos, self.player_direction));
             if self.player_pos == self.point_pos {
                 self.points += 1;
-                println!("Points: {}", self.points);
+                self.point_pos =
+                    IVec2::new(self.noise.next() as i32 % 10, self.noise.next() as i32 % 10);
+                self.point_sprite
+                    .set_transform(position_transform(self.point_pos, Direction::Up));
                 self.points_text = make_text(data.graphics, self.font, self.points);
             }
         }
