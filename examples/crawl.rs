@@ -1,6 +1,6 @@
 use std::f32::consts::TAU;
 
-use current::graphics::{FontID, Frame};
+use current::graphics::{FontID, Frame, Graphics};
 use current::input::InputState;
 use current::sprite::{Filter, Sprite, Transform};
 use current::{Game, GameData, GameExt};
@@ -78,14 +78,7 @@ impl Game for Crawl {
             .with_transform(position_transform(point_pos, Direction::Up)),
 
             font,
-            points_text: Sprite::new_text_rect(
-                data.graphics,
-                font,
-                "Points: 0",
-                24,
-                Color::WHITE,
-                Filter::Linear,
-            ),
+            points_text: make_text(data.graphics, font, 0),
             points: 0,
         }
     }
@@ -119,14 +112,7 @@ impl Game for Crawl {
             if self.player_pos == self.point_pos {
                 self.points += 1;
                 println!("Points: {}", self.points);
-                self.points_text = Sprite::new_text_rect(
-                    data.graphics,
-                    self.font,
-                    &format!("Points: {}", self.points),
-                    24,
-                    Color::WHITE,
-                    Filter::Linear,
-                )
+                self.points_text = make_text(data.graphics, self.font, self.points);
             }
         }
     }
@@ -145,4 +131,15 @@ fn position_transform(pos: IVec2, direction: Direction) -> Transform {
         ..Default::default()
     }
     .with_straight_rotation(direction.into())
+}
+
+fn make_text(graphics: &mut Graphics, font: FontID, points: u32) -> Sprite {
+    Sprite::new_text_rect(
+        graphics,
+        font,
+        &format!("Points: {}", points),
+        72,
+        Color::WHITE,
+        Filter::Linear,
+    )
 }
