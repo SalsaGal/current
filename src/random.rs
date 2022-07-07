@@ -31,3 +31,9 @@ impl Noise {
         self.get(self.index)
     }
 }
+
+impl Default for Noise {
+    fn default() -> Self {
+        Self::new()
+    }
+}
