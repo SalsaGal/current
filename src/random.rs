@@ -1,11 +1,14 @@
 use std::time::SystemTime;
 
+/// A random noise function which is used to get random
+/// but reproducable numbers.
 pub struct Noise {
     pub seed: u32,
     pub index: u32,
 }
 
 impl Noise {
+    /// Make a new noise generator with the seed set to the current unix time.
     pub fn new() -> Self {
         let seed = SystemTime::now()
             .duration_since(SystemTime::UNIX_EPOCH)

@@ -72,6 +72,7 @@ pub trait GameExt
 where
     Self: Sized,
 {
+    /// Begin executing the game.
     fn run(init: GameInit) -> !;
 }
 

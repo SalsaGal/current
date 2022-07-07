@@ -14,7 +14,7 @@ use winit::window::Window;
 
 use crate::sprite::{ColorVertex, Filter, TextureVertex, Transform};
 
-pub type Font = TextRenderer;
+/// A unique identifier for each font stored.
 pub type FontID = usize;
 
 /// The core component that handles all general purpose graphics.
@@ -23,15 +23,20 @@ pub struct Graphics {
     pub queue: Queue,
     surface: Surface,
     pub(crate) config: SurfaceConfiguration,
+    /// If this is `Some`, then it specifies the size of the rendering space.
+    /// Otherwise the rendering space is just the same as the pixel position. For example,
+    /// in a 640x480 window, 640,0 would be on the right of the window, but if frame_size
+    /// was Some(Vec2::new(2.0, 2.0)), then the right side of the window would be 1,0.
     pub frame_size: Option<Vec2>,
 
-    pub fonts: IndexMap<FontID, Font>,
+    pub fonts: IndexMap<FontID, TextRenderer>,
     next_font: FontID,
     pub texture_manager: TextureManager,
     depth_texture: TextureView,
 
     color_pipeline: RenderPipeline,
     texture_pipeline: RenderPipeline,
+    /// The color used to clear the screen every frame. Black by default.
     pub background_color: Color,
 }
 
@@ -282,6 +287,7 @@ impl Graphics {
         self.frame_size.unwrap_or_else(|| self.get_window_size())
     }
 
+    /// Load a font from the true type font at `path`.
     pub fn load_font(&mut self, path: &str) -> FontID {
         let contents = std::fs::read(path).unwrap();
         let font = TextRenderer::try_new_with_ttf_font_data(&contents).unwrap();
@@ -293,6 +299,7 @@ impl Graphics {
 
 /// A handle for structures that are needed during rendering itself.
 pub struct Frame<'a> {
+    /// The size of the window or frame if `Graphics::frame_size` is some.
     pub frame_size: Vec2,
     pub texture_manager: &'a TextureManager,
     pub(crate) render_pass: RenderPass<'a>,
@@ -442,6 +449,8 @@ impl TextureManager {
         self.next_id = 0;
     }
 
+    /// Get the texture if it is available. Index into the manager if you want
+    /// to get an error texture to replace missing textures.
     pub fn get(&self, id: TextureID) -> Option<&BindGroup> {
         self.textures.get(&id)
     }

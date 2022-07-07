@@ -7,8 +7,9 @@ use winit::event::{ElementState, KeyboardInput, MouseButton, ScanCode};
 pub struct Input {
     keys: HashMap<ScanCode, InputState>,
     buttons: HashMap<MouseButton, InputState>,
+    /// The position of the mouse on the window.
     pub mouse_pos: Vec2,
-    /// Amount of motion this update
+    /// Amount of motion this update.
     pub mouse_mov: Vec2,
 }
 
@@ -22,6 +23,7 @@ impl Input {
         }
     }
 
+    /// Check if a mouse button is pressed.
     pub fn is_button(&self, button: MouseButton, state: InputState) -> bool {
         let actual = *self.buttons.get(&button).unwrap_or(&InputState::Up);
         match state {
@@ -31,6 +33,7 @@ impl Input {
         }
     }
 
+    /// Check if a keyboard key is pressed.
     pub fn is_key(&self, key: ScanCode, state: InputState) -> bool {
         let actual = *self.keys.get(&key).unwrap_or(&InputState::Up);
         match state {
