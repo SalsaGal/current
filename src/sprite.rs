@@ -242,7 +242,7 @@ impl Sprite {
         let width = pixmap.size.width;
         let height = pixmap.size.height;
         let image = {
-            let mut image = RgbaImage::new(width, height);
+            let mut image = RgbaImage::new(width + 1, height + 1);
             for index in 0..pixmap.data.data().len() / 4 {
                 let array = [
                     pixmap.data.data()[index * 4],
