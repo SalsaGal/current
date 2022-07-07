@@ -364,6 +364,17 @@ impl Sprite {
         self.transform_outdated = true;
         self
     }
+
+    pub fn with_modified_transform<F: FnOnce(Transform) -> Transform>(mut self, f: F) -> Self {
+        self.transform = f(self.transform);
+        self.transform_outdated = true;
+        self
+    }
+
+    pub fn modify_transform<F: FnOnce(Transform) -> Transform>(&mut self, f: F) {
+        self.transform = f(self.transform);
+        self.transform_outdated = true;
+    }
 }
 
 enum SpriteType {
@@ -404,6 +415,15 @@ macro_rules! transform_methods {
 
 impl Transform {
     transform_methods!(translation: Vec3, rotation: Quat, scale: Vec2);
+
+    pub fn with_z(mut self, z: f32) -> Self {
+        self.translation.z = z;
+        self
+    }
+
+    pub fn set_z(&mut self, z: f32) {
+        self.translation.z = z;
+    }
 
     pub fn with_straight_rotation(mut self, angle: f32) -> Self {
         self.rotation = Quat::from_euler(glam::EulerRot::XYZ, 0.0, 0.0, angle);
