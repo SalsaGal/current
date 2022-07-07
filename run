@@ -1,2 +1,5 @@
 [default]
 cargo run --example crawl $@
+
+[check]
+cargo clippy --examples
