@@ -147,5 +147,6 @@ fn make_text(graphics: &mut Graphics, font: FontID, points: u32) -> Sprite {
         72,
         Color::WHITE,
         Filter::Linear,
-    ).with_modified_transform(|transform| transform.with_z(1.0))
+    )
+    .with_modified_transform(|transform| transform.with_z(1.0))
 }
