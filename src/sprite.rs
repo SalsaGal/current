@@ -426,27 +426,12 @@ impl Transform {
     }
 
     pub fn with_translation_corner(mut self, translation: Vec3, corner: Corner) -> Self {
-        let translation = translation
-            + match corner {
-                Corner {
-                    h: Horizontal::Left,
-                    v: Vertical::Up,
-                } => self.scale.extend(0.0) * Vec3::new(0.5, -0.5, 0.0),
-                Corner {
-                    h: Horizontal::Right,
-                    v: Vertical::Up,
-                } => self.scale.extend(0.0) * Vec3::new(-0.5, -0.5, 0.0),
-                Corner {
-                    h: Horizontal::Left,
-                    v: Vertical::Down,
-                } => self.scale.extend(0.0) * Vec3::new(0.5, 0.5, 0.0),
-                Corner {
-                    h: Horizontal::Right,
-                    v: Vertical::Down,
-                } => self.scale.extend(0.0) * Vec3::new(-0.5, 0.5, 0.0),
-            };
-        self.translation = translation;
+        self.translation = translation + (self.scale * corner.half_offset()).extend(0.0);
         self
+    }
+
+    pub fn set_translation_corner(&mut self, translation: Vec3, corner: Corner) {
+        self.translation = translation + (self.scale * corner.half_offset()).extend(0.0);
     }
 
     pub fn with_straight_rotation(mut self, angle: f32) -> Self {
@@ -515,6 +500,29 @@ pub enum Filter {
 pub struct Corner {
     pub h: Horizontal,
     pub v: Vertical,
+}
+
+impl Corner {
+    pub fn half_offset(&self) -> Vec2 {
+        match self {
+            Corner {
+                h: Horizontal::Left,
+                v: Vertical::Up,
+            } => Vec2::new(0.5, -0.5),
+            Corner {
+                h: Horizontal::Right,
+                v: Vertical::Up,
+            } => Vec2::new(-0.5, -0.5),
+            Corner {
+                h: Horizontal::Left,
+                v: Vertical::Down,
+            } => Vec2::new(0.5, 0.5),
+            Corner {
+                h: Horizontal::Right,
+                v: Vertical::Down,
+            } => Vec2::new(-0.5, 0.5),
+        }
+    }
 }
 
 impl From<(Horizontal, Vertical)> for Corner {
