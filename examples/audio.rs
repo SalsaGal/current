@@ -2,7 +2,7 @@ use current::*;
 use kira::sound::static_sound::{StaticSoundData, StaticSoundSettings};
 
 fn main() {
-    AudioExample::run(GameInit::default());
+    AudioExample::run();
 }
 
 struct AudioExample {

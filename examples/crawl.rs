@@ -9,11 +9,7 @@ use glam::{IVec2, Vec2};
 use wgpu::Color;
 
 fn main() {
-    Crawl::run(current::GameInit {
-        window_title: "Crawler",
-        window_fullscreen: true,
-        ..Default::default()
-    });
+    Crawl::run();
 }
 
 struct Crawl {
@@ -51,6 +47,7 @@ impl From<Direction> for f32 {
 
 impl Game for Crawl {
     fn init(data: &mut GameData) -> Self {
+        data.set_fullscreen(true);
         data.graphics.background_color = Color::BLUE;
         let player_pos = IVec2::ZERO;
         let point_pos = IVec2::new(5, 8);

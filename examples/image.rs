@@ -3,7 +3,7 @@ use current::sprite::{Filter, Sprite, Transform};
 use current::*;
 
 fn main() {
-    Image::run(GameInit::default());
+    Image::run();
 }
 
 struct Image {

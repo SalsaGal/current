@@ -5,7 +5,7 @@ use current::*;
 use wgpu::Color;
 
 fn main() {
-    TextDemo::run(GameInit::default());
+    TextDemo::run();
 }
 
 struct TextDemo {

@@ -16,25 +16,6 @@ use winit::window::{Fullscreen, Window, WindowBuilder};
 
 use crate::input::Input;
 
-/// Variables used to initialise the game.
-pub struct GameInit {
-    pub window_resizable: bool,
-    pub window_size: UVec2,
-    pub window_title: &'static str,
-    pub window_fullscreen: bool,
-}
-
-impl Default for GameInit {
-    fn default() -> Self {
-        Self {
-            window_resizable: true,
-            window_title: "Current window",
-            window_size: UVec2::new(640, 480),
-            window_fullscreen: false,
-        }
-    }
-}
-
 /// A struct containing references to all core components of the library.
 pub struct GameData<'a> {
     pub audio: &'a mut Audio,
@@ -46,10 +27,25 @@ pub struct GameData<'a> {
 }
 
 impl GameData<'_> {
-    pub fn resize_window(&mut self, size: UVec2) {
+    pub fn set_fullscreen(&mut self, fullscreen: bool) {
+        self.window.set_fullscreen(match fullscreen {
+            true => Some(Fullscreen::Borderless(None)),
+            false => None,
+        });
+    }
+
+    pub fn set_resizable(&mut self, resizable: bool) {
+        self.window.set_resizable(resizable);
+    }
+
+    pub fn set_window_size(&mut self, size: UVec2) {
         let size = PhysicalSize::new(size.x, size.y);
         self.window.set_inner_size(size);
         self.graphics.resize(size);
+    }
+
+    pub fn set_title(&mut self, title: &str) {
+        self.window.set_title(title);
     }
 }
 
@@ -73,7 +69,7 @@ where
     Self: Sized,
 {
     /// Begin executing the game.
-    fn run(init: GameInit) -> !;
+    fn run() -> !;
 }
 
 impl<T: 'static> GameExt for T
@@ -81,18 +77,9 @@ where
     T: Game,
 {
     /// Used to start the game.
-    fn run(init: GameInit) -> ! {
+    fn run() -> ! {
         let event_loop = EventLoop::new();
-        let mut window = WindowBuilder::new()
-            .with_title(init.window_title)
-            .with_inner_size(PhysicalSize::new(init.window_size.x, init.window_size.y))
-            .with_resizable(init.window_resizable)
-            .with_fullscreen(match init.window_fullscreen {
-                true => Some(Fullscreen::Borderless(None)),
-                false => None,
-            })
-            .build(&event_loop)
-            .unwrap();
+        let mut window = WindowBuilder::new().build(&event_loop).unwrap();
 
         let mut audio = Audio::new();
         let mut graphics = pollster::block_on(Graphics::new(&window));

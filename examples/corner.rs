@@ -5,10 +5,7 @@ use glam::{Vec2, Vec3};
 use wgpu::Color;
 
 fn main() {
-    CornerTest::run(GameInit {
-        window_size: (600, 500).into(),
-        ..Default::default()
-    });
+    CornerTest::run();
 }
 
 struct CornerTest {
@@ -28,6 +25,7 @@ fn corner(i: u8) -> Corner {
 
 impl Game for CornerTest {
     fn init(data: &mut GameData) -> Self {
+        data.set_window_size((600, 500).into());
         Self {
             rect: Sprite::new_color_rect(data.graphics, Color::GREEN).with_transform(
                 Transform {

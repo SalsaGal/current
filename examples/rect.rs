@@ -5,10 +5,7 @@ use glam::Vec2;
 use wgpu::Color;
 
 fn main() {
-    Rect::run(GameInit {
-        window_size: (600, 500).into(),
-        ..Default::default()
-    });
+    Rect::run();
 }
 
 struct Rect {
@@ -17,6 +14,7 @@ struct Rect {
 
 impl Game for Rect {
     fn init(data: &mut GameData) -> Self {
+        data.set_window_size((600, 500).into());
         Self {
             rect: Sprite::new_color_rect(data.graphics, Color::GREEN).with_transform(Transform {
                 scale: Vec2::new(200.0, 200.0),

@@ -1,15 +1,12 @@
 use std::f32::consts::TAU;
 
 use current::sprite::{Sprite, Transform};
-use current::{Game, GameData, GameExt, GameInit};
+use current::{Game, GameData, GameExt};
 use glam::Vec2;
 use wgpu::Color;
 
 fn main() {
-    Rotate::run(GameInit {
-        window_size: (512, 512).into(),
-        ..Default::default()
-    });
+    Rotate::run();
 }
 
 struct Rotate {
@@ -20,6 +17,7 @@ struct Rotate {
 
 impl Game for Rotate {
     fn init(data: &mut GameData) -> Self {
+        data.set_window_size((512, 512).into());
         Self {
             sprite: Sprite::new_color_rect(data.graphics, Color::RED)
                 .with_transform(Transform::scale(Vec2::new(32.0, 32.0))),

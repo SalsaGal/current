@@ -1,16 +1,14 @@
 use current::*;
 
 fn main() {
-    Window::run(GameInit {
-        window_title: "Window Title",
-        ..Default::default()
-    });
+    Window::run();
 }
 
 struct Window;
 
 impl Game for Window {
-    fn init(_: &mut GameData) -> Self {
+    fn init(data: &mut GameData) -> Self {
+        data.set_title("Window Title");
         Self
     }
 }
