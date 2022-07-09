@@ -530,24 +530,15 @@ impl Corner {
     );
 
     pub fn half_offset(&self) -> Vec2 {
-        match self {
-            Corner {
-                h: Horizontal::Left,
-                v: Vertical::Up,
-            } => Vec2::new(-0.5, 0.5),
-            Corner {
-                h: Horizontal::Right,
-                v: Vertical::Up,
-            } => Vec2::new(0.5, 0.5),
-            Corner {
-                h: Horizontal::Left,
-                v: Vertical::Down,
-            } => Vec2::new(-0.5, -0.5),
-            Corner {
-                h: Horizontal::Right,
-                v: Vertical::Down,
-            } => Vec2::new(0.5, -0.5),
-        }
+        let horizontal = match self.h {
+            Horizontal::Left => -0.5,
+            Horizontal::Right => 0.5,
+        };
+        let vertical = match self.v {
+            Vertical::Down => -0.5,
+            Vertical::Up => 0.5,
+        };
+        Vec2::new(horizontal, vertical)
     }
 }
 
