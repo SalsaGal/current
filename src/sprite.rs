@@ -425,6 +425,30 @@ impl Transform {
         self.translation.z = z;
     }
 
+    pub fn with_translation_corner(mut self, translation: Vec3, corner: Corner) -> Self {
+        let translation = translation
+            + match corner {
+                Corner {
+                    h: Horizontal::Left,
+                    v: Vertical::Up,
+                } => self.scale.extend(0.0) * Vec3::new(0.5, -0.5, 0.0),
+                Corner {
+                    h: Horizontal::Right,
+                    v: Vertical::Up,
+                } => self.scale.extend(0.0) * Vec3::new(-0.5, -0.5, 0.0),
+                Corner {
+                    h: Horizontal::Left,
+                    v: Vertical::Down,
+                } => self.scale.extend(0.0) * Vec3::new(0.5, 0.5, 0.0),
+                Corner {
+                    h: Horizontal::Right,
+                    v: Vertical::Down,
+                } => self.scale.extend(0.0) * Vec3::new(-0.5, 0.5, 0.0),
+            };
+        self.translation = translation;
+        self
+    }
+
     pub fn with_straight_rotation(mut self, angle: f32) -> Self {
         self.rotation = Quat::from_euler(glam::EulerRot::XYZ, 0.0, 0.0, angle);
         self
@@ -486,4 +510,25 @@ impl Default for Transform {
 pub enum Filter {
     Linear,
     Nearest,
+}
+
+pub struct Corner {
+    pub h: Horizontal,
+    pub v: Vertical,
+}
+
+impl From<(Horizontal, Vertical)> for Corner {
+    fn from((h, v): (Horizontal, Vertical)) -> Self {
+        Self { h, v }
+    }
+}
+
+pub enum Horizontal {
+    Left,
+    Right,
+}
+
+pub enum Vertical {
+    Up,
+    Down,
 }
