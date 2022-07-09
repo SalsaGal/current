@@ -534,19 +534,19 @@ impl Corner {
             Corner {
                 h: Horizontal::Left,
                 v: Vertical::Up,
-            } => Vec2::new(0.5, -0.5),
+            } => Vec2::new(-0.5, 0.5),
             Corner {
                 h: Horizontal::Right,
                 v: Vertical::Up,
-            } => Vec2::new(-0.5, -0.5),
+            } => Vec2::new(0.5, 0.5),
             Corner {
                 h: Horizontal::Left,
                 v: Vertical::Down,
-            } => Vec2::new(0.5, 0.5),
+            } => Vec2::new(-0.5, -0.5),
             Corner {
                 h: Horizontal::Right,
                 v: Vertical::Down,
-            } => Vec2::new(-0.5, 0.5),
+            } => Vec2::new(0.5, -0.5),
         }
     }
 }
