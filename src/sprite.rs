@@ -502,7 +502,33 @@ pub struct Corner {
     pub v: Vertical,
 }
 
+macro_rules! corner_new {
+    ($($ident: ident: $horizontal: ident, $vertical: ident),*) => {
+        $(
+            paste::paste! {
+                pub fn [<new_ $ident>]() -> Self {
+                    Self {
+                        h: Horizontal::$horizontal,
+                        v: Vertical::$vertical,
+                    }
+                }
+            }
+        )*
+    }
+}
+
 impl Corner {
+    corner_new!(
+        left_up: Left,
+        Up,
+        left_down: Left,
+        Down,
+        right_up: Right,
+        Up,
+        right_down: Right,
+        Down
+    );
+
     pub fn half_offset(&self) -> Vec2 {
         match self {
             Corner {

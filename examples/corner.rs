@@ -1,5 +1,5 @@
 use current::graphics::Frame;
-use current::sprite::{Corner, Horizontal, Sprite, Transform, Vertical};
+use current::sprite::{Corner, Sprite, Transform};
 use current::*;
 use glam::{Vec2, Vec3};
 use wgpu::Color;
@@ -18,22 +18,10 @@ struct CornerTest {
 
 fn corner(i: u8) -> Corner {
     match i % 4 {
-        0 => Corner {
-            h: Horizontal::Left,
-            v: Vertical::Up,
-        },
-        1 => Corner {
-            h: Horizontal::Right,
-            v: Vertical::Up,
-        },
-        2 => Corner {
-            h: Horizontal::Left,
-            v: Vertical::Down,
-        },
-        3 => Corner {
-            h: Horizontal::Right,
-            v: Vertical::Down,
-        },
+        0 => Corner::new_right_down(),
+        1 => Corner::new_left_down(),
+        2 => Corner::new_right_up(),
+        3 => Corner::new_left_up(),
         _ => unreachable!(),
     }
 }
@@ -46,13 +34,7 @@ impl Game for CornerTest {
                     scale: Vec2::new(200.0, 200.0),
                     ..Default::default()
                 }
-                .with_translation_corner(
-                    Vec3::ZERO,
-                    Corner {
-                        h: Horizontal::Left,
-                        v: Vertical::Up,
-                    },
-                ),
+                .with_translation_corner(Vec3::ZERO, corner(0)),
             ),
             i: 0,
         }
