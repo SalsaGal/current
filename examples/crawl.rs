@@ -111,8 +111,10 @@ impl Game for Crawl {
                 .set_transform(position_transform(self.player_pos, self.player_direction));
             if self.player_pos == self.point_pos {
                 self.points += 1;
-                self.point_pos =
-                    IVec2::new(self.noise.next() as i32 % 10, self.noise.next() as i32 % 10);
+                self.point_pos = IVec2::new(
+                    self.noise.next().unwrap() as i32 % 10,
+                    self.noise.next().unwrap() as i32 % 10,
+                );
                 self.point_sprite
                     .set_transform(position_transform(self.point_pos, Direction::Up));
                 self.points_text = make_text(data.graphics, self.font, self.points);

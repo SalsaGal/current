@@ -28,10 +28,17 @@ impl Noise {
             ^ index.rotate_right(1 + (self.seed % 3))
             ^ self.seed.rotate_right(index % self.seed)
     }
+}
 
-    pub fn next(&mut self) -> u32 {
-        self.index += 1;
-        self.get(self.index)
+impl Iterator for Noise {
+    type Item = u32;
+    fn next(&mut self) -> Option<u32> {
+        if self.index == u32::MAX {
+            None
+        } else {
+            self.index += 1;
+            Some(self.get(self.index))
+        }
     }
 }
 
