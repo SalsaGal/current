@@ -25,7 +25,7 @@ pub struct Graphics {
     pub(crate) config: SurfaceConfiguration,
     /// If this is `Some`, then it specifies the size of the rendering space.
     /// Otherwise the rendering space is just the same as the pixel position. For example,
-    /// in a 640x480 window, 640,0 would be on the right of the window, but if frame_size
+    /// in a 640x480 window, 320,0 would be on the right of the window, but if frame_size
     /// was Some(Vec2::new(2.0, 2.0)), then the right side of the window would be 1,0.
     pub frame_size: Option<Vec2>,
 
