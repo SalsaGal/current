@@ -302,10 +302,10 @@ pub struct Frame<'a> {
     /// The size of the window or frame if `Graphics::frame_size` is some.
     pub frame_size: Vec2,
     pub texture_manager: &'a TextureManager,
-    pub(crate) render_pass: RenderPass<'a>,
+    pub render_pass: RenderPass<'a>,
+    pub queue: &'a Queue,
     pub(crate) color_pipeline: &'a RenderPipeline,
     pub(crate) texture_pipeline: &'a RenderPipeline,
-    pub(crate) queue: &'a Queue,
 }
 
 /// An identifier used to locate textures within a `TextureManager`'s list of textures.
