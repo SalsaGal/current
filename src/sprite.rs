@@ -1,4 +1,5 @@
 use std::mem::size_of;
+use std::path::Path;
 
 use glam::{Mat4, Quat, Vec2, Vec3};
 use image::RgbaImage;
@@ -102,11 +103,11 @@ impl Sprite {
         }
     }
 
-    pub fn new_path_mesh(
+    pub fn new_path_mesh<T: AsRef<Path>>(
         graphics: &mut Graphics,
         vertices: &[TextureVertex],
         indices: &[u16],
-        path: &str,
+        path: T,
         filter: Filter,
     ) -> Self {
         let id = graphics.texture_manager.make_texture(
@@ -214,7 +215,7 @@ impl Sprite {
         }
     }
 
-    pub fn new_path_rect(graphics: &mut Graphics, path: &str, filter: Filter) -> Self {
+    pub fn new_path_rect<T: AsRef<Path>>(graphics: &mut Graphics, path: T, filter: Filter) -> Self {
         let id = graphics.texture_manager.make_texture(
             &graphics.device,
             &graphics.queue,

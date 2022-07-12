@@ -1,5 +1,5 @@
-use std::num::NonZeroU32;
 use std::ops::Index;
+use std::{num::NonZeroU32, path::Path};
 
 use glam::Vec2;
 use image::{DynamicImage, GenericImageView};
@@ -288,7 +288,7 @@ impl Graphics {
     }
 
     /// Load a font from the true type font at `path`.
-    pub fn load_font(&mut self, path: &str) -> FontID {
+    pub fn load_font<T: AsRef<Path>>(&mut self, path: T) -> FontID {
         let contents = std::fs::read(path).unwrap();
         let font = TextRenderer::try_new_with_ttf_font_data(&contents).unwrap();
         self.fonts.insert(self.next_font, font);
