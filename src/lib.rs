@@ -64,7 +64,9 @@ pub trait Game: GameExt {
     fn handle_event(&mut self, _: &mut GameData, _: &Event<()>) {}
     /// Code executed when the game quits, this function returns a boolean of whether to
     /// actually quit or not.
-    fn exit(&mut self, _: &mut GameData) -> bool { true }
+    fn exit(&mut self, _: &mut GameData) -> bool {
+        true
+    }
 }
 
 pub trait GameExt
@@ -123,7 +125,7 @@ where
                         if game.exit(&mut game_data) {
                             *control_flow = ControlFlow::Exit;
                         }
-                    },
+                    }
                     WindowEvent::CursorMoved { position, .. } => input.handle_cursor(position),
                     WindowEvent::KeyboardInput { input: event, .. } => input.handle_key(event),
                     WindowEvent::MouseInput { button, state, .. } => {
