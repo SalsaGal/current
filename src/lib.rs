@@ -62,6 +62,9 @@ pub trait Game: GameExt {
     /// Handle input events from winit directly before the engine handles them. Useful
     /// for more specific uses of hardware or features that Current doesn't support.
     fn handle_event(&mut self, _: &mut GameData, _: &Event<()>) {}
+    /// Code executed when the game quits, this function returns a boolean of whether to
+    /// actually quit or not.
+    fn exit(&mut self, _: &mut GameData) -> bool { true }
 }
 
 pub trait GameExt
@@ -116,7 +119,11 @@ where
                     graphics.render(|pass| game.render(pass));
                 }
                 Event::WindowEvent { event, .. } => match event {
-                    WindowEvent::CloseRequested => *control_flow = ControlFlow::Exit,
+                    WindowEvent::CloseRequested => {
+                        if game.exit(&mut game_data) {
+                            *control_flow = ControlFlow::Exit;
+                        }
+                    },
                     WindowEvent::CursorMoved { position, .. } => input.handle_cursor(position),
                     WindowEvent::KeyboardInput { input: event, .. } => input.handle_key(event),
                     WindowEvent::MouseInput { button, state, .. } => {
