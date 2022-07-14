@@ -295,6 +295,12 @@ impl Graphics {
         self.next_font += 1;
         self.next_font - 1
     }
+
+    /// Empty the font cache
+    pub fn clear_fonts(&mut self) {
+        self.fonts.clear();
+        self.next_font = 0;
+    }
 }
 
 /// A handle for structures that are needed during rendering itself.
