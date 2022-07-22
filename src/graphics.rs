@@ -69,7 +69,7 @@ impl Graphics {
 
         let config = wgpu::SurfaceConfiguration {
             usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
-            format: surface.get_preferred_format(&adapter).unwrap(),
+            format: surface.get_supported_formats(&adapter)[0],
             width: size.width,
             height: size.height,
             present_mode: wgpu::PresentMode::Fifo,
@@ -79,7 +79,7 @@ impl Graphics {
         let texture_manager = TextureManager::new(&device, &queue);
         let depth_texture = Self::make_depth_texture(&device, &config);
 
-        let color_shader = device.create_shader_module(&wgpu::ShaderModuleDescriptor {
+        let color_shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
             label: Some("color_shader"),
             source: wgpu::ShaderSource::Wgsl(include_str!("color.wgsl").into()),
         });
@@ -102,11 +102,11 @@ impl Graphics {
             fragment: Some(wgpu::FragmentState {
                 module: &color_shader,
                 entry_point: "fragment_main",
-                targets: &[wgpu::ColorTargetState {
+                targets: &[Some(wgpu::ColorTargetState {
                     format: config.format,
                     blend: Some(wgpu::BlendState::ALPHA_BLENDING),
                     write_mask: wgpu::ColorWrites::ALL,
-                }],
+                })],
             }),
             primitive: wgpu::PrimitiveState {
                 topology: wgpu::PrimitiveTopology::TriangleList,
@@ -132,7 +132,7 @@ impl Graphics {
             multiview: None,
         });
 
-        let texture_shader = device.create_shader_module(&wgpu::ShaderModuleDescriptor {
+        let texture_shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
             label: Some("texture_shader"),
             source: wgpu::ShaderSource::Wgsl(include_str!("texture.wgsl").into()),
         });
@@ -155,11 +155,11 @@ impl Graphics {
             fragment: Some(wgpu::FragmentState {
                 module: &texture_shader,
                 entry_point: "fragment_main",
-                targets: &[wgpu::ColorTargetState {
+                targets: &[Some(wgpu::ColorTargetState {
                     format: config.format,
                     blend: Some(wgpu::BlendState::ALPHA_BLENDING),
                     write_mask: wgpu::ColorWrites::ALL,
-                }],
+                })],
             }),
             primitive: wgpu::PrimitiveState {
                 topology: wgpu::PrimitiveTopology::TriangleList,
@@ -236,14 +236,14 @@ impl Graphics {
         {
             let render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
                 label: Some("render_pass"),
-                color_attachments: &[wgpu::RenderPassColorAttachment {
+                color_attachments: &[Some(wgpu::RenderPassColorAttachment {
                     view: &view,
                     resolve_target: None,
                     ops: wgpu::Operations {
                         load: wgpu::LoadOp::Clear(self.background_color),
                         store: true,
                     },
-                }],
+                })],
                 depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
                     view: &self.depth_texture,
                     depth_ops: Some(wgpu::Operations {

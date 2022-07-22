@@ -2,7 +2,7 @@
 name = "current"
 description = "A Rust 2D game library built off WGPU"
 license = "MIT"
-version = "0.4.0"
+version = "0.4.1"
 edition = "2021"
 
 [dependencies]
@@ -14,5 +14,5 @@ kira = { version = "0.6.0", features = ["flac"] }
 paste = "1.0.7"
 pollster = "0.2.5"
 text-to-png = { version = "0.2.0", git = "https://github.com/itsfarseen/text-to-png" } 
-wgpu = "0.12.0"
+wgpu = "0.13.1"
 winit = "0.26.1"
